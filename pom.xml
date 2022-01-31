@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>id.global</groupId>
+        <artifactId>microservice-parent</artifactId>
+        <version>4.2</version>
+        <relativePath/>
+    </parent>
+    <groupId>id.global.iris</groupId>
+    <artifactId>manager</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <scm>
+        <connection>scm:git:git@github.com:globalid/core-router.git</connection>
+        <developerConnection>scm:git:git@github.com:globalid/core-router.git</developerConnection>
+        <url>https://github.com/globalid/core-router</url>
+        <tag>HEAD</tag>
+    </scm>
+    <properties>
+        <version.globalid.common>1.1.1</version.globalid.common>
+        <version.quarkus-rabbitmq-client>0.4.2.Final</version.quarkus-rabbitmq-client>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>id.global.common</groupId>
+            <artifactId>globalid-common</artifactId>
+            <version>${version.globalid.common}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.quarkiverse.rabbitmqclient</groupId>
+            <artifactId>quarkus-rabbitmq-client</artifactId>
+            <version>${version.quarkus-rabbitmq-client}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-junit5</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
