@@ -1,7 +1,7 @@
 package id.global.iris.manager.retry;
 
-import static id.global.common.headers.amqp.MessageHeaders.EVENT_TYPE;
-import static id.global.iris.manager.Headers.RequeueHeaders.X_RETRY_COUNT;
+import static id.global.common.headers.amqp.MessagingHeaders.Message.EVENT_TYPE;
+import static id.global.common.headers.amqp.MessagingHeaders.RequeueMessage.X_RETRY_COUNT;
 import static id.global.iris.manager.retry.AmpqMessage.ERR_SERVER_ERROR;
 
 import java.io.IOException;
@@ -25,7 +25,7 @@ import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Delivery;
 import com.rabbitmq.client.Envelope;
 
-import id.global.common.headers.amqp.MessageHeaders;
+import id.global.common.headers.amqp.MessagingHeaders;
 import id.global.iris.manager.InstanceInfoProvider;
 import id.global.iris.manager.retry.error.ErrorMessage;
 import io.quarkiverse.rabbitmqclient.RabbitMQClient;
@@ -59,6 +59,7 @@ public class RetryHandler {
     RequeueHandler requeueHandler;
 
     protected Channel channel;
+
     protected String retryInstanceId;
 
     @Inject
@@ -85,7 +86,6 @@ public class RetryHandler {
     }
 
     protected void declareExchangeAndQueues() {
-        final String queueWithSuffix = getNameSuffix(retryInstanceId);
         Map<String, Object> args = new HashMap<>();
         args.put("x-message-ttl", 5000);
 
@@ -101,7 +101,6 @@ public class RetryHandler {
     }
 
     private void queueBind(final String queueName) throws IOException {
-        final var routingKey = "#." + RETRY_QUEUE_NAME;
         channel.queueBind(queueName, RETRY_EXCHANGE, RETRY_QUEUE_NAME);
         log.info("binding: '{}' --> '{}' with routing key: '{}'", queueName, RETRY_EXCHANGE, RETRY_QUEUE_NAME);
     }
@@ -165,7 +164,7 @@ public class RetryHandler {
     private void sendErrorMessage(ErrorMessage message, AmpqMessage consumedMessage, String originalRoutingKey,
             Channel channel) {
         final var headers = new HashMap<>(consumedMessage.properties().getHeaders());
-        headers.remove(MessageHeaders.JWT);
+        headers.remove(MessagingHeaders.Message.JWT);
         headers.put(EVENT_TYPE, ERROR_MESSAGE_EXCHANGE);
         final var basicProperties = consumedMessage.properties().builder()
                 .headers(headers)

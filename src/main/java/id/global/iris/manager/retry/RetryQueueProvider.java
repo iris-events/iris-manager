@@ -1,8 +1,8 @@
 package id.global.iris.manager.retry;
 
-import static id.global.iris.manager.Headers.QueueDeclarationHeaders.X_DEAD_LETTER_EXCHANGE;
-import static id.global.iris.manager.Headers.QueueDeclarationHeaders.X_DEAD_LETTER_ROUTING_KEY;
-import static id.global.iris.manager.Headers.QueueDeclarationHeaders.X_MESSAGE_TTL;
+import static id.global.common.headers.amqp.MessagingHeaders.QueueDeclaration.X_DEAD_LETTER_EXCHANGE;
+import static id.global.common.headers.amqp.MessagingHeaders.QueueDeclaration.X_DEAD_LETTER_ROUTING_KEY;
+import static id.global.common.headers.amqp.MessagingHeaders.QueueDeclaration.X_MESSAGE_TTL;
 import static id.global.iris.manager.retry.RetryHandler.RETRY_EXCHANGE;
 import static id.global.iris.manager.retry.RetryHandler.RETRY_WAIT_ENDED_QUEUE;
 

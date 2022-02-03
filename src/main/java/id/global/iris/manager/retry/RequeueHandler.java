@@ -1,7 +1,7 @@
 package id.global.iris.manager.retry;
 
-import static id.global.iris.manager.Headers.RequeueHeaders.X_ORIGINAL_EXCHANGE;
-import static id.global.iris.manager.Headers.RequeueHeaders.X_ORIGINAL_ROUTING_KEY;
+import static id.global.common.headers.amqp.MessagingHeaders.RequeueMessage.X_ORIGINAL_EXCHANGE;
+import static id.global.common.headers.amqp.MessagingHeaders.RequeueMessage.X_ORIGINAL_ROUTING_KEY;
 import static id.global.iris.manager.retry.RetryHandler.RETRY_EXCHANGE;
 import static id.global.iris.manager.retry.RetryHandler.RETRY_WAIT_ENDED_QUEUE;
 

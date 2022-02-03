@@ -1,11 +1,11 @@
 package id.global.iris.manager.retry;
 
-import static id.global.iris.manager.Headers.RequeueHeaders.X_ERROR_CODE;
-import static id.global.iris.manager.Headers.RequeueHeaders.X_MAX_RETRIES;
-import static id.global.iris.manager.Headers.RequeueHeaders.X_NOTIFY_CLIENT;
-import static id.global.iris.manager.Headers.RequeueHeaders.X_ORIGINAL_EXCHANGE;
-import static id.global.iris.manager.Headers.RequeueHeaders.X_ORIGINAL_ROUTING_KEY;
-import static id.global.iris.manager.Headers.RequeueHeaders.X_RETRY_COUNT;
+import static id.global.common.headers.amqp.MessagingHeaders.RequeueMessage.X_ERROR_CODE;
+import static id.global.common.headers.amqp.MessagingHeaders.RequeueMessage.X_MAX_RETRIES;
+import static id.global.common.headers.amqp.MessagingHeaders.RequeueMessage.X_NOTIFY_CLIENT;
+import static id.global.common.headers.amqp.MessagingHeaders.RequeueMessage.X_ORIGINAL_EXCHANGE;
+import static id.global.common.headers.amqp.MessagingHeaders.RequeueMessage.X_ORIGINAL_ROUTING_KEY;
+import static id.global.common.headers.amqp.MessagingHeaders.RequeueMessage.X_RETRY_COUNT;
 
 import java.util.Optional;
 
