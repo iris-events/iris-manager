@@ -36,10 +36,6 @@ public record AmpqMessage(byte[] body, AMQP.BasicProperties properties, Envelope
         return getStringHeader(properties, "currentServiceId");
     }
 
-    public String routerId() {
-        return getStringHeader(properties, "router");
-    }
-
     public String originalExchange() {
         return getStringHeader(properties, X_ORIGINAL_EXCHANGE);
     }

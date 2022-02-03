@@ -1,0 +1,22 @@
+include:
+  - project: 'globalid/infrastructure/gitlab-ci'
+    ref: master
+    file:
+      - '/templates/quarkus-service-current.yml'
+      - '/include/eda/eda-models.yml'
+
+cache:
+  policy: pull-push
+  paths:
+    - .m2/repository
+
+test:
+  extends: .test
+  variables:
+    RABBIT_HOST: rabbitmq
+    RABBIT_USERNAME: user
+    RABBIT_PASSWORD: user
+  services:
+    - name: rabbitmq:3.8.19-alpine
+      alias: rabbitmq
+  stage: test
