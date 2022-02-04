@@ -92,7 +92,7 @@ jobs:
     needs:
       - docker
       - build
-    uses: globalid/core-auth/.github/workflows/k8s-legacy.yml@master
+    uses: globalid/core-auth/.github/workflows/_deploy.yml@master
     with:
       env-name: "dev"
       namespace: "core"
