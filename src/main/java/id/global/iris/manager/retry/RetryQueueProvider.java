@@ -20,7 +20,7 @@ import id.global.iris.manager.config.Configuration;
 
 @ApplicationScoped
 public class RetryQueueProvider {
-    private static final String RETRY_QUEUE_TEMPLATE = "retry.retry-queue-%d";
+    private static final String RETRY_QUEUE_TEMPLATE = Queues.RETRY_WAIT_TTL_PREFIX + "%d";
 
     @Inject
     Configuration config;
