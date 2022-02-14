@@ -2,8 +2,6 @@ package id.global.iris.manager.retry;
 
 import static id.global.common.headers.amqp.MessagingHeaders.RequeueMessage.X_ORIGINAL_EXCHANGE;
 import static id.global.common.headers.amqp.MessagingHeaders.RequeueMessage.X_ORIGINAL_ROUTING_KEY;
-import static id.global.iris.manager.retry.RetryHandler.RETRY_EXCHANGE;
-import static id.global.iris.manager.retry.RetryHandler.RETRY_QUEUE_NAME;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -63,7 +61,7 @@ class RetryHandlerIT {
                         X_ORIGINAL_ROUTING_KEY, "#." + RETRIED_MESSAGE_EXCHANGE))
                 .build();
 
-        channel.basicPublish(RETRY_EXCHANGE, RETRY_QUEUE_NAME, basicProperties, writeValueAsBytes(message));
+        channel.basicPublish("retry", "retry", basicProperties, writeValueAsBytes(message));
 
         final var retriedMessage = service.getMessage().get(5, TimeUnit.SECONDS);
         assertThat(retriedMessage.id(), is(messageId));
