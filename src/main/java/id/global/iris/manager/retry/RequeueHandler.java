@@ -6,7 +6,6 @@ import static id.global.common.headers.amqp.MessagingHeaders.RequeueMessage.X_OR
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Objects;
-import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -15,12 +14,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
 
 import id.global.common.iris.Exchanges;
 import id.global.common.iris.Queues;
-import id.global.iris.manager.InstanceInfoProvider;
-import io.quarkiverse.rabbitmqclient.RabbitMQClient;
+import id.global.iris.manager.connection.ConnectionProvider;
 
 /**
  * Consumes message from retry dead letter queue (retry-wait-ended) after retry TTL has expired
@@ -31,38 +28,30 @@ public class RequeueHandler {
 
     private static final Logger log = LoggerFactory.getLogger(RequeueHandler.class);
 
-    @Inject
-    RabbitMQClient rabbitMQClient;
+    private static final String DEFAULT_VHOST = "/";
+    private static final String RETRY_WAIT_ENDED_QUEUE_NAME = Queues.RETRY_WAIT_ENDED.getValue();
+    private static final String RETRY_EXCHANGE_NAME = Exchanges.RETRY.getValue();
 
     @Inject
-    InstanceInfoProvider instanceInfoProvider;
+    ConnectionProvider connectionProvider;
 
     protected Channel channel;
-    protected String retryInstanceId;
 
     public void init() {
-        retryInstanceId = instanceInfoProvider.getInstanceName();
-        final var channelId = UUID.randomUUID().toString();
         try {
-            channel = createChanel(channelId);
+            channel = connectionProvider.connect(DEFAULT_VHOST);
             queueBind();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
 
-    private Channel createChanel(final String channelId) throws IOException {
-        Connection connection = rabbitMQClient.connect(channelId);
-        return connection.createChannel();
-    }
-
     private void queueBind() throws IOException {
-        channel.queueDeclare(Queues.RETRY_WAIT_ENDED.getValue(), true, false, false, null);
-        channel.queueBind(Queues.RETRY_WAIT_ENDED.getValue(), Exchanges.RETRY.getValue(), Queues.RETRY_WAIT_ENDED.getValue());
-        log.info("Starting consumer on {} with routing key {}", Queues.RETRY_WAIT_ENDED.getValue(),
-                Queues.RETRY_WAIT_ENDED.getValue());
+        channel.queueDeclare(RETRY_WAIT_ENDED_QUEUE_NAME, true, false, false, null);
+        channel.queueBind(RETRY_WAIT_ENDED_QUEUE_NAME, RETRY_EXCHANGE_NAME, RETRY_WAIT_ENDED_QUEUE_NAME);
+        log.info("Starting consumer on {} with routing key {}", RETRY_WAIT_ENDED_QUEUE_NAME, RETRY_WAIT_ENDED_QUEUE_NAME);
 
-        channel.basicConsume(Queues.RETRY_WAIT_ENDED.getValue(), true,
+        channel.basicConsume(RETRY_WAIT_ENDED_QUEUE_NAME, true,
                 ((consumerTag, message) -> {
                     // this relays messages from RETRY queues to original queues
                     final var headers = message.getProperties().getHeaders();
@@ -74,9 +63,9 @@ public class RequeueHandler {
                     channel.basicPublish(originalExchange, originalRoutingKey, message.getProperties(), message.getBody());
                 }),
                 consumerTag -> log.warn("Basic consume on {}.{} cancelled. Message for will not be retried",
-                        Exchanges.RETRY.getValue(),
-                        Queues.RETRY_WAIT_ENDED.getValue()),
-                (consumerTag, sig) -> log.warn("Consumer for {}.{} shut down.", Exchanges.RETRY.getValue(),
-                        Queues.RETRY_WAIT_ENDED.getValue()));
+                        RETRY_EXCHANGE_NAME,
+                        RETRY_WAIT_ENDED_QUEUE_NAME),
+                (consumerTag, sig) -> log.warn("Consumer for {}.{} shut down.", RETRY_EXCHANGE_NAME,
+                        RETRY_WAIT_ENDED_QUEUE_NAME));
     }
 }
