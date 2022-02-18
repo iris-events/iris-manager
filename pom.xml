@@ -19,8 +19,8 @@
         <tag>HEAD</tag>
     </scm>
     <properties>
-        <version.globalid.event-messaging>1.2.6-SNAPSHOT</version.globalid.event-messaging>
-        <version.globalid.common>1.1.3-SNAPSHOT</version.globalid.common>
+        <version.globalid.event-messaging>1.2.6</version.globalid.event-messaging>
+        <version.globalid.common>1.1.3</version.globalid.common>
         <version.quarkus-rabbitmq-client>0.4.2.Final</version.quarkus-rabbitmq-client>
     </properties>
     <dependencies>
