@@ -20,7 +20,7 @@ import id.global.iris.manager.config.Configuration;
 
 @ApplicationScoped
 public class RetryQueueProvider {
-    private static final String RETRY_QUEUE_TEMPLATE = Queues.RETRY_WAIT_TTL_PREFIX + "%d";
+    private static final String RETRY_QUEUE_TEMPLATE = Queues.RETRY_WAIT_TTL_PREFIX.getValue() + "%d";
 
     @Inject
     Configuration config;
@@ -44,7 +44,7 @@ public class RetryQueueProvider {
 
     private void declareWaitEndedQueue(final Channel channel) {
         try {
-            channel.queueDeclare(Queues.RETRY_WAIT_ENDED, true, false, false, null);
+            channel.queueDeclare(Queues.RETRY_WAIT_ENDED.getValue(), true, false, false, null);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -55,7 +55,7 @@ public class RetryQueueProvider {
         final var queueDeclarationArgs = getRequeueDeclarationParams(ttl);
         try {
             channel.queueDeclare(queueName, true, false, false, queueDeclarationArgs);
-            channel.queueBind(queueName, Exchanges.RETRY, queueName);
+            channel.queueBind(queueName, Exchanges.RETRY.getValue(), queueName);
 
             return new RetryQueue(queueName, ttl);
         } catch (IOException e) {
@@ -73,7 +73,7 @@ public class RetryQueueProvider {
     private Map<String, Object> getRequeueDeclarationParams(long ttl) {
         return Map.of(
                 X_MESSAGE_TTL, ttl,
-                X_DEAD_LETTER_ROUTING_KEY, Queues.RETRY_WAIT_ENDED,
-                X_DEAD_LETTER_EXCHANGE, Exchanges.RETRY);
+                X_DEAD_LETTER_ROUTING_KEY, Queues.RETRY_WAIT_ENDED.getValue(),
+                X_DEAD_LETTER_EXCHANGE, Exchanges.RETRY.getValue());
     }
 }

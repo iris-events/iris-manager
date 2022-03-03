@@ -57,11 +57,12 @@ public class RequeueHandler {
     }
 
     private void queueBind() throws IOException {
-        channel.queueDeclare(Queues.RETRY_WAIT_ENDED, true, false, false, null);
-        channel.queueBind(Queues.RETRY_WAIT_ENDED, Exchanges.RETRY, Queues.RETRY_WAIT_ENDED);
-        log.info("Starting consumer on {} with routing key {}", Queues.RETRY_WAIT_ENDED, Queues.RETRY_WAIT_ENDED);
+        channel.queueDeclare(Queues.RETRY_WAIT_ENDED.getValue(), true, false, false, null);
+        channel.queueBind(Queues.RETRY_WAIT_ENDED.getValue(), Exchanges.RETRY.getValue(), Queues.RETRY_WAIT_ENDED.getValue());
+        log.info("Starting consumer on {} with routing key {}", Queues.RETRY_WAIT_ENDED.getValue(),
+                Queues.RETRY_WAIT_ENDED.getValue());
 
-        channel.basicConsume(Queues.RETRY_WAIT_ENDED, true,
+        channel.basicConsume(Queues.RETRY_WAIT_ENDED.getValue(), true,
                 ((consumerTag, message) -> {
                     // this relays messages from RETRY queues to original queues
                     final var headers = message.getProperties().getHeaders();
@@ -72,8 +73,10 @@ public class RequeueHandler {
 
                     channel.basicPublish(originalExchange, originalRoutingKey, message.getProperties(), message.getBody());
                 }),
-                consumerTag -> log.warn("Basic consume on {}.{} cancelled. Message for will not be retried", Exchanges.RETRY,
-                        Queues.RETRY_WAIT_ENDED),
-                (consumerTag, sig) -> log.warn("Consumer for {}.{} shut down.", Exchanges.RETRY, Queues.RETRY_WAIT_ENDED));
+                consumerTag -> log.warn("Basic consume on {}.{} cancelled. Message for will not be retried",
+                        Exchanges.RETRY.getValue(),
+                        Queues.RETRY_WAIT_ENDED.getValue()),
+                (consumerTag, sig) -> log.warn("Consumer for {}.{} shut down.", Exchanges.RETRY.getValue(),
+                        Queues.RETRY_WAIT_ENDED.getValue()));
     }
 }

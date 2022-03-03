@@ -88,8 +88,8 @@ public class RetryHandler {
 
         try {
             // declare exchanges and queues
-            channel.exchangeDeclare(Exchanges.RETRY, BuiltinExchangeType.DIRECT, true, false, null);
-            channel.queueDeclare(Queues.RETRY, true, false, false, args);
+            channel.exchangeDeclare(Exchanges.RETRY.getValue(), BuiltinExchangeType.DIRECT, true, false, null);
+            channel.queueDeclare(Queues.RETRY.getValue(), true, false, false, args);
             queueBind();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -98,20 +98,20 @@ public class RetryHandler {
     }
 
     private void queueBind() throws IOException {
-        channel.queueBind(Queues.RETRY, Exchanges.RETRY, Queues.RETRY);
-        log.info("binding: '{}' --> '{}' with routing key: '{}'", Queues.RETRY, Exchanges.RETRY,
-                Queues.RETRY);
+        channel.queueBind(Queues.RETRY.getValue(), Exchanges.RETRY.getValue(), Queues.RETRY.getValue());
+        log.info("binding: '{}' --> '{}' with routing key: '{}'", Queues.RETRY.getValue(), Exchanges.RETRY.getValue(),
+                Queues.RETRY.getValue());
     }
 
     protected void setListener() {
         try {
-            channel.basicConsume(Queues.RETRY, true, new DefaultConsumer(channel) {
+            channel.basicConsume(Queues.RETRY.getValue(), true, new DefaultConsumer(channel) {
                 @Override
                 public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties,
                         byte[] body) {
 
                     log.info("exchange: {}, queue: {}, routing key: {}, deliveryTag: {}", envelope.getExchange(),
-                            Queues.RETRY,
+                            Queues.RETRY.getValue(),
                             envelope.getRoutingKey(), envelope.getDeliveryTag());
 
                     final var message = new AmpqMessage(body, properties, envelope);
@@ -125,7 +125,7 @@ public class RetryHandler {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-        log.info("consumer started on '{}'", Queues.RETRY);
+        log.info("consumer started on '{}'", Queues.RETRY.getValue());
     }
 
     public void onMessage(AmpqMessage message) throws IOException {
@@ -160,7 +160,7 @@ public class RetryHandler {
             log.info("Got retryable message: retryCount={}, retryQueue={}", retryCount, retryQueueName);
 
             final var newMessage = getMessageWithNewHeaders(message, retryCount);
-            channel.basicPublish(Exchanges.RETRY, retryQueueName, newMessage.getProperties(), newMessage.getBody());
+            channel.basicPublish(Exchanges.RETRY.getValue(), retryQueueName, newMessage.getProperties(), newMessage.getBody());
         }
     }
 
@@ -168,14 +168,15 @@ public class RetryHandler {
             Channel channel) {
         final var headers = new HashMap<>(consumedMessage.properties().getHeaders());
         headers.remove(MessagingHeaders.Message.JWT);
-        headers.put(EVENT_TYPE, Exchanges.ERROR);
+        headers.put(EVENT_TYPE, Exchanges.ERROR.getValue());
         final var basicProperties = consumedMessage.properties().builder()
                 .headers(headers)
                 .build();
         final var routingKey = originalRoutingKey + ".error";
         try {
-            log.info("Sending error message to exchange: {} with routing key: {}", Exchanges.ERROR, routingKey);
-            channel.basicPublish(Exchanges.ERROR, routingKey, basicProperties, objectMapper.writeValueAsBytes(message));
+            log.info("Sending error message to exchange: {} with routing key: {}", Exchanges.ERROR.getValue(), routingKey);
+            channel.basicPublish(Exchanges.ERROR.getValue(), routingKey, basicProperties,
+                    objectMapper.writeValueAsBytes(message));
         } catch (IOException e) {
             log.error("Unable to write error message as bytes. Discarding error message. Message: {}", message);
         }
@@ -185,7 +186,7 @@ public class RetryHandler {
         final var applicationName = instanceInfoProvider.getApplicationName();
         final var instanceId = instanceInfoProvider.getInstanceName();
 
-        return Queues.RETRY + "." + applicationName + "." + instanceId;
+        return Queues.RETRY.getValue() + "." + applicationName + "." + instanceId;
     }
 
     private Delivery getMessageWithNewHeaders(AmpqMessage message, int retryCount) {
