@@ -2,8 +2,6 @@ package id.global.iris.manager.retry;
 
 import static id.global.common.headers.amqp.MessagingHeaders.RequeueMessage.X_ORIGINAL_EXCHANGE;
 import static id.global.common.headers.amqp.MessagingHeaders.RequeueMessage.X_ORIGINAL_ROUTING_KEY;
-import static id.global.iris.manager.retry.RetryHandler.RETRY_EXCHANGE;
-import static id.global.iris.manager.retry.RetryHandler.RETRY_WAIT_ENDED_QUEUE;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -19,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 
+import id.global.common.iris.Exchanges;
+import id.global.common.iris.Queues;
 import id.global.iris.manager.InstanceInfoProvider;
 import io.quarkiverse.rabbitmqclient.RabbitMQClient;
 
@@ -57,11 +57,12 @@ public class RequeueHandler {
     }
 
     private void queueBind() throws IOException {
-        channel.queueDeclare(RETRY_WAIT_ENDED_QUEUE, true, false, false, null);
-        channel.queueBind(RETRY_WAIT_ENDED_QUEUE, RETRY_EXCHANGE, RETRY_WAIT_ENDED_QUEUE);
-        log.info("Starting consumer on {} with routing key {}", RETRY_WAIT_ENDED_QUEUE, RETRY_WAIT_ENDED_QUEUE);
+        channel.queueDeclare(Queues.RETRY_WAIT_ENDED.getValue(), true, false, false, null);
+        channel.queueBind(Queues.RETRY_WAIT_ENDED.getValue(), Exchanges.RETRY.getValue(), Queues.RETRY_WAIT_ENDED.getValue());
+        log.info("Starting consumer on {} with routing key {}", Queues.RETRY_WAIT_ENDED.getValue(),
+                Queues.RETRY_WAIT_ENDED.getValue());
 
-        channel.basicConsume(RETRY_WAIT_ENDED_QUEUE, true,
+        channel.basicConsume(Queues.RETRY_WAIT_ENDED.getValue(), true,
                 ((consumerTag, message) -> {
                     // this relays messages from RETRY queues to original queues
                     final var headers = message.getProperties().getHeaders();
@@ -71,8 +72,11 @@ public class RequeueHandler {
                             originalExchange, originalRoutingKey);
 
                     channel.basicPublish(originalExchange, originalRoutingKey, message.getProperties(), message.getBody());
-                }), consumerTag -> log.warn("Basic consume on {}.{} cancelled. Message for will not be retried", RETRY_EXCHANGE,
-                        RETRY_WAIT_ENDED_QUEUE),
-                (consumerTag, sig) -> log.warn("Consumer for {}.{} shut down.", RETRY_EXCHANGE, RETRY_WAIT_ENDED_QUEUE));
+                }),
+                consumerTag -> log.warn("Basic consume on {}.{} cancelled. Message for will not be retried",
+                        Exchanges.RETRY.getValue(),
+                        Queues.RETRY_WAIT_ENDED.getValue()),
+                (consumerTag, sig) -> log.warn("Consumer for {}.{} shut down.", Exchanges.RETRY.getValue(),
+                        Queues.RETRY_WAIT_ENDED.getValue()));
     }
 }

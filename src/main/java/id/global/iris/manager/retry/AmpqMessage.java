@@ -1,5 +1,7 @@
 package id.global.iris.manager.retry;
 
+import static id.global.common.headers.amqp.MessagingHeaders.QueueDeclaration.X_DEAD_LETTER_EXCHANGE;
+import static id.global.common.headers.amqp.MessagingHeaders.QueueDeclaration.X_DEAD_LETTER_ROUTING_KEY;
 import static id.global.common.headers.amqp.MessagingHeaders.RequeueMessage.X_ERROR_CODE;
 import static id.global.common.headers.amqp.MessagingHeaders.RequeueMessage.X_MAX_RETRIES;
 import static id.global.common.headers.amqp.MessagingHeaders.RequeueMessage.X_NOTIFY_CLIENT;
@@ -34,6 +36,14 @@ public record AmpqMessage(byte[] body, AMQP.BasicProperties properties, Envelope
 
     public String currentServiceId() {
         return getStringHeader(properties, "currentServiceId");
+    }
+
+    public Optional<String> deadLetterExchange() {
+        return Optional.ofNullable(getStringHeader(properties, X_DEAD_LETTER_EXCHANGE));
+    }
+
+    public Optional<String> deadLetterRoutingKey() {
+        return Optional.ofNullable(getStringHeader(properties, X_DEAD_LETTER_ROUTING_KEY));
     }
 
     public String originalExchange() {
