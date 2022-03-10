@@ -1,0 +1,20 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - '*'
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: run-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: setup java
+        uses: globalid/github-actions/java-setup@main
+      - name: Build with Maven
+        run: mvn -B verify --file pom.xml
+
