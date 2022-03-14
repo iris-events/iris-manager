@@ -6,7 +6,7 @@
     <parent>
         <groupId>id.global</groupId>
         <artifactId>microservice-parent</artifactId>
-        <version>4.3</version>
+        <version>4.6</version>
         <relativePath/>
     </parent>
     <groupId>id.global.iris</groupId>
@@ -21,7 +21,7 @@
     <properties>
         <version.globalid.event-messaging>1.2.7</version.globalid.event-messaging>
         <version.globalid.common>1.1.6</version.globalid.common>
-        <version.quarkus-rabbitmq-client>0.4.2.Final</version.quarkus-rabbitmq-client>
+        <version.quarkus-rabbitmq-client>0.5.0.Final</version.quarkus-rabbitmq-client>
     </properties>
     <dependencies>
         <dependency>
