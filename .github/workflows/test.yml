@@ -1,0 +1,27 @@
+name: Build
+"on":
+  push:
+    branches:
+      - '*'
+    tags:
+      - v*
+  workflow_dispatch: null
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: run-tests
+    services:
+      rabbitmq:
+        image: rabbitmq:3.8-alpine
+        ports:
+          - 5672:5672
+        env: {}
+    env:
+      RABBIT_HOST: localhost
+      RABBIT_PASSWORD: user
+      RABBIT_USERNAME: user
+    steps:
+      - name: setup java
+        uses: globalid/github-actions/java-setup@main
+      - shell: sh
+        run: mvn -B verify -ntp
