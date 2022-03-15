@@ -40,6 +40,8 @@ import io.quarkus.runtime.StartupEvent;
 public class RetryHandler {
 
     private static final Logger log = LoggerFactory.getLogger(RetryHandler.class);
+    private static final String RETRY_QUEUE_NAME = Queues.RETRY.getValue();
+    private static final String RETRY_EXCHANGE_NAME = Exchanges.RETRY.getValue();
 
     private final ObjectMapper objectMapper;
 
@@ -88,8 +90,8 @@ public class RetryHandler {
 
         try {
             // declare exchanges and queues
-            channel.exchangeDeclare(Exchanges.RETRY.getValue(), BuiltinExchangeType.DIRECT, true, false, null);
-            channel.queueDeclare(Queues.RETRY.getValue(), true, false, false, args);
+            channel.exchangeDeclare(RETRY_EXCHANGE_NAME, BuiltinExchangeType.DIRECT, true, false, null);
+            channel.queueDeclare(RETRY_QUEUE_NAME, true, false, false, args);
             queueBind();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -98,20 +100,20 @@ public class RetryHandler {
     }
 
     private void queueBind() throws IOException {
-        channel.queueBind(Queues.RETRY.getValue(), Exchanges.RETRY.getValue(), Queues.RETRY.getValue());
-        log.info("binding: '{}' --> '{}' with routing key: '{}'", Queues.RETRY.getValue(), Exchanges.RETRY.getValue(),
-                Queues.RETRY.getValue());
+        channel.queueBind(RETRY_QUEUE_NAME, RETRY_EXCHANGE_NAME, RETRY_QUEUE_NAME);
+        log.info("binding: '{}' --> '{}' with routing key: '{}'", RETRY_QUEUE_NAME, RETRY_EXCHANGE_NAME,
+                RETRY_QUEUE_NAME);
     }
 
     protected void setListener() {
         try {
-            channel.basicConsume(Queues.RETRY.getValue(), true, new DefaultConsumer(channel) {
+            channel.basicConsume(RETRY_QUEUE_NAME, true, new DefaultConsumer(channel) {
                 @Override
                 public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties,
                         byte[] body) {
 
                     log.info("exchange: {}, queue: {}, routing key: {}, deliveryTag: {}", envelope.getExchange(),
-                            Queues.RETRY.getValue(),
+                            RETRY_QUEUE_NAME,
                             envelope.getRoutingKey(), envelope.getDeliveryTag());
 
                     final var message = new AmpqMessage(body, properties, envelope);
@@ -125,7 +127,7 @@ public class RetryHandler {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-        log.info("consumer started on '{}'", Queues.RETRY.getValue());
+        log.info("consumer started on '{}'", RETRY_QUEUE_NAME);
     }
 
     public void onMessage(AmpqMessage message) throws IOException {
@@ -160,7 +162,7 @@ public class RetryHandler {
             log.info("Got retryable message: retryCount={}, retryQueue={}", retryCount, retryQueueName);
 
             final var newMessage = getMessageWithNewHeaders(message, retryCount);
-            channel.basicPublish(Exchanges.RETRY.getValue(), retryQueueName, newMessage.getProperties(), newMessage.getBody());
+            channel.basicPublish(RETRY_EXCHANGE_NAME, retryQueueName, newMessage.getProperties(), newMessage.getBody());
         }
     }
 
@@ -186,7 +188,7 @@ public class RetryHandler {
         final var applicationName = instanceInfoProvider.getApplicationName();
         final var instanceId = instanceInfoProvider.getInstanceName();
 
-        return Queues.RETRY.getValue() + "." + applicationName + "." + instanceId;
+        return String.format("%s.%s.%s", RETRY_QUEUE_NAME, applicationName, instanceId);
     }
 
     private Delivery getMessageWithNewHeaders(AmpqMessage message, int retryCount) {
