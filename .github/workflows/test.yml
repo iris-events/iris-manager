@@ -18,8 +18,8 @@ jobs:
         env: {}
     env:
       RABBIT_HOST: localhost
-      RABBIT_PASSWORD: user
-      RABBIT_USERNAME: user
+      RABBIT_PASSWORD: guest
+      RABBIT_USERNAME: guest
     steps:
       - name: setup java
         uses: globalid/github-actions/java-setup@main

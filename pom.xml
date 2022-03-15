@@ -19,8 +19,8 @@
         <tag>HEAD</tag>
     </scm>
     <properties>
-        <version.globalid.event-messaging>1.2.7</version.globalid.event-messaging>
-        <version.globalid.common>1.1.6</version.globalid.common>
+        <version.globalid.event-messaging>1.2.8</version.globalid.event-messaging>
+        <version.globalid.common>1.1.8</version.globalid.common>
         <version.quarkus-rabbitmq-client>0.5.0.Final</version.quarkus-rabbitmq-client>
         <version.hamcrest>2.2</version.hamcrest>
     </properties>
