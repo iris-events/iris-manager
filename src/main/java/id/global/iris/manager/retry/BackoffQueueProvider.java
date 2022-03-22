@@ -17,20 +17,23 @@ import com.rabbitmq.client.Channel;
 import id.global.common.iris.Exchanges;
 import id.global.common.iris.Queues;
 import id.global.iris.manager.config.Configuration;
+import id.global.iris.manager.infrastructure.InfrastructureDeclarator;
 
 @ApplicationScoped
-public class RetryQueueProvider {
+public class BackoffQueueProvider {
     private static final String RETRY_QUEUE_TEMPLATE = Queues.RETRY_WAIT_TTL_PREFIX.getValue() + "%d";
 
     @Inject
     Configuration config;
 
+    @Inject
+    InfrastructureDeclarator infrastructureDeclarator;
+
     private final ConcurrentHashMap<Long, RetryQueue> ttlRetryQueues = new ConcurrentHashMap<>();
 
-    public void declareInitialQueues(final Channel channel) {
+    public void declareBackoffQueues(final Channel channel) {
         final var maxRetries = config.retry().maxRetries();
 
-        declareWaitEndedQueue(channel);
         for (int retryCount = 0; retryCount < maxRetries; retryCount++) {
             final var ttl = getTtl(retryCount);
             ttlRetryQueues.computeIfAbsent(ttl, retryQueue -> declareRetryQueue(channel, ttl));
@@ -42,19 +45,12 @@ public class RetryQueueProvider {
         return ttlRetryQueues.computeIfAbsent(ttl, retryQueue -> declareRetryQueue(channel, ttl));
     }
 
-    private void declareWaitEndedQueue(final Channel channel) {
-        try {
-            channel.queueDeclare(Queues.RETRY_WAIT_ENDED.getValue(), true, false, false, null);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
     private RetryQueue declareRetryQueue(final Channel channel, final Long ttl) {
         final var queueName = String.format(RETRY_QUEUE_TEMPLATE, ttl);
-        final var queueDeclarationArgs = getRequeueDeclarationParams(ttl);
+        final var args = getRequeueDeclarationParams(ttl);
         try {
-            channel.queueDeclare(queueName, true, false, false, queueDeclarationArgs);
+            final var details = new InfrastructureDeclarator.QueueDeclarationDetails(queueName, true, false, false, args);
+            infrastructureDeclarator.declareQueueWithRecreateOnConflict(channel, details);
             channel.queueBind(queueName, Exchanges.RETRY.getValue(), queueName);
 
             return new RetryQueue(queueName, ttl);

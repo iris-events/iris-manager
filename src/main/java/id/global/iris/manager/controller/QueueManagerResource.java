@@ -1,5 +1,7 @@
 package id.global.iris.manager.controller;
 
+import static com.rabbitmq.client.ConnectionFactory.DEFAULT_VHOST;
+
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
@@ -30,7 +32,6 @@ public class QueueManagerResource {
 
     private static final Logger log = LoggerFactory.getLogger(QueueManagerResource.class);
     private static final String DEFAULT_LIMIT = "10";
-    private static final String DEFAULT_VHOST = "/";
 
     private final RabbitMqFacade facade;
 

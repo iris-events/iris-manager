@@ -28,7 +28,6 @@ public class RequeueHandler {
 
     private static final Logger log = LoggerFactory.getLogger(RequeueHandler.class);
 
-    private static final String DEFAULT_VHOST = "/";
     private static final String RETRY_WAIT_ENDED_QUEUE_NAME = Queues.RETRY_WAIT_ENDED.getValue();
     private static final String RETRY_EXCHANGE_NAME = Exchanges.RETRY.getValue();
 
@@ -39,7 +38,7 @@ public class RequeueHandler {
 
     public void init() {
         try {
-            channel = connectionProvider.connect(DEFAULT_VHOST);
+            channel = connectionProvider.connect();
             queueBind();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -47,8 +46,6 @@ public class RequeueHandler {
     }
 
     private void queueBind() throws IOException {
-        channel.queueDeclare(RETRY_WAIT_ENDED_QUEUE_NAME, true, false, false, null);
-        channel.queueBind(RETRY_WAIT_ENDED_QUEUE_NAME, RETRY_EXCHANGE_NAME, RETRY_WAIT_ENDED_QUEUE_NAME);
         log.info("Starting consumer on {} with routing key {}", RETRY_WAIT_ENDED_QUEUE_NAME, RETRY_WAIT_ENDED_QUEUE_NAME);
 
         channel.basicConsume(RETRY_WAIT_ENDED_QUEUE_NAME, true,

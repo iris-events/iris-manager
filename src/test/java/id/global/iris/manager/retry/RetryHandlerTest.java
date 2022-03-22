@@ -32,7 +32,7 @@ import io.quarkus.test.junit.QuarkusTest;
 @QuarkusTest
 @Tag("integration")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class RetryHandlerIT {
+class RetryHandlerTest {
 
     public static final String RETRIED_MESSAGE_EXCHANGE = "retried-message";
     private Channel channel;

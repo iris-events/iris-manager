@@ -14,6 +14,8 @@ import io.quarkiverse.rabbitmqclient.RabbitMQClient;
 @ApplicationScoped
 public class ConnectionProvider {
 
+    private static final String DEFAULT_VHOST = "/";
+
     private final RabbitMQClient rabbitMQClient;
     private final String applicationName;
     private final String instanceName;
@@ -23,6 +25,11 @@ public class ConnectionProvider {
         this.rabbitMQClient = rabbitMQClient;
         this.applicationName = instanceInfoProvider.getApplicationName();
         this.instanceName = instanceInfoProvider.getInstanceName();
+    }
+
+    public Channel connect() throws IOException {
+        final var connection = getConnection(DEFAULT_VHOST);
+        return connection.createChannel();
     }
 
     public Channel connect(final String vhost) throws IOException {
