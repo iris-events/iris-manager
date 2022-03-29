@@ -7,10 +7,8 @@ import static id.global.iris.manager.retry.AmpqMessage.ERR_SERVER_ERROR;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.HashMap;
-import java.util.Map;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -18,9 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.AMQP;
-import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Delivery;
 import com.rabbitmq.client.Envelope;
@@ -29,9 +25,8 @@ import id.global.common.headers.amqp.MessagingHeaders;
 import id.global.common.iris.Exchanges;
 import id.global.common.iris.Queues;
 import id.global.iris.manager.InstanceInfoProvider;
+import id.global.iris.manager.connection.ConnectionProvider;
 import id.global.iris.manager.retry.error.ErrorMessage;
-import io.quarkiverse.rabbitmqclient.RabbitMQClient;
-import io.quarkus.runtime.StartupEvent;
 
 /**
  * Consumes messages from general retry queue and publishes them to TTL backoff retry queue.
@@ -44,15 +39,13 @@ public class RetryHandler {
     private static final String RETRY_EXCHANGE_NAME = Exchanges.RETRY.getValue();
 
     private final ObjectMapper objectMapper;
-
-    @Inject
-    RabbitMQClient rabbitMQClient;
+    private final ConnectionProvider connectionProvider;
 
     @Inject
     InstanceInfoProvider instanceInfoProvider;
 
     @Inject
-    RetryQueueProvider retryQueueProvider;
+    BackoffQueueProvider backoffQueueProvider;
 
     @Inject
     RequeueHandler requeueHandler;
@@ -62,47 +55,25 @@ public class RetryHandler {
     protected String retryInstanceId;
 
     @Inject
-    public RetryHandler(final ObjectMapper objectMapper) {
+    public RetryHandler(final ObjectMapper objectMapper, final ConnectionProvider connectionProvider) {
         this.objectMapper = objectMapper;
+        this.connectionProvider = connectionProvider;
     }
 
-    public void onApplicationStart(@Observes StartupEvent event) {
+    public void initialize() {
         log.info("Retry handler starting up...");
         retryInstanceId = instanceInfoProvider.getInstanceName();
-        channel = createChanel();
-        declareExchangeAndQueues();
-        retryQueueProvider.declareInitialQueues(channel);
+        channel = getChanel();
         requeueHandler.init();
-    }
-
-    private Channel createChanel() {
-        try {
-            Connection connection = rabbitMQClient.connect(getConnectionName());
-            return connection.createChannel();
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
-    protected void declareExchangeAndQueues() {
-        Map<String, Object> args = new HashMap<>();
-        args.put("x-message-ttl", 5000);
-
-        try {
-            // declare exchanges and queues
-            channel.exchangeDeclare(RETRY_EXCHANGE_NAME, BuiltinExchangeType.DIRECT, true, false, null);
-            channel.queueDeclare(RETRY_QUEUE_NAME, true, false, false, args);
-            queueBind();
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
         setListener();
     }
 
-    private void queueBind() throws IOException {
-        channel.queueBind(RETRY_QUEUE_NAME, RETRY_EXCHANGE_NAME, RETRY_QUEUE_NAME);
-        log.info("binding: '{}' --> '{}' with routing key: '{}'", RETRY_QUEUE_NAME, RETRY_EXCHANGE_NAME,
-                RETRY_QUEUE_NAME);
+    private Channel getChanel() {
+        try {
+            return connectionProvider.connect();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     protected void setListener() {
@@ -157,7 +128,7 @@ public class RetryHandler {
                         message.body());
             }
         } else {
-            final var retryQueue = retryQueueProvider.getQueue(channel, retryCount);
+            final var retryQueue = backoffQueueProvider.getQueue(channel, retryCount);
             final var retryQueueName = retryQueue.queueName();
             log.info("Got retryable message: retryCount={}, retryQueue={}", retryCount, retryQueueName);
 
@@ -182,13 +153,6 @@ public class RetryHandler {
         } catch (IOException e) {
             log.error("Unable to write error message as bytes. Discarding error message. Message: {}", message);
         }
-    }
-
-    private String getConnectionName() {
-        final var applicationName = instanceInfoProvider.getApplicationName();
-        final var instanceId = instanceInfoProvider.getInstanceName();
-
-        return String.format("%s.%s.%s", RETRY_QUEUE_NAME, applicationName, instanceId);
     }
 
     private Delivery getMessageWithNewHeaders(AmpqMessage message, int retryCount) {
