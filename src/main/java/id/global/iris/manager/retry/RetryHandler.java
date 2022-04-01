@@ -2,7 +2,6 @@ package id.global.iris.manager.retry;
 
 import static id.global.common.headers.amqp.MessagingHeaders.Message.EVENT_TYPE;
 import static id.global.common.headers.amqp.MessagingHeaders.RequeueMessage.X_RETRY_COUNT;
-import static id.global.iris.manager.retry.AmpqMessage.ERR_SERVER_ERROR;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -27,6 +26,7 @@ import id.global.common.iris.Queues;
 import id.global.iris.manager.InstanceInfoProvider;
 import id.global.iris.manager.connection.ConnectionProvider;
 import id.global.iris.manager.retry.error.ErrorMessage;
+import id.global.iris.messaging.runtime.api.error.ServerError;
 
 /**
  * Consumes messages from general retry queue and publishes them to TTL backoff retry queue.
@@ -87,7 +87,7 @@ public class RetryHandler {
                             RETRY_QUEUE_NAME,
                             envelope.getRoutingKey(), envelope.getDeliveryTag());
 
-                    final var message = new AmpqMessage(body, properties, envelope);
+                    final var message = new AmqpMessage(body, properties, envelope);
                     try {
                         onMessage(message);
                     } catch (Exception e) {
@@ -101,7 +101,7 @@ public class RetryHandler {
         log.info("consumer started on '{}'", RETRY_QUEUE_NAME);
     }
 
-    public void onMessage(AmpqMessage message) throws IOException {
+    public void onMessage(AmqpMessage message) throws IOException {
         final int retryCount = message.retryCount();
         final var maxRetries = message.maxRetries();
 
@@ -117,7 +117,8 @@ public class RetryHandler {
                     maxRetries, originalExchange, originalRoutingKey, errorCode));
 
             if (notifyClient) {
-                final var errorMessage = new ErrorMessage("INTERNAL_SERVER_ERROR", ERR_SERVER_ERROR, "Something went wrong");
+                final var errorMessage = new ErrorMessage(ServerError.SERVER_ERROR.getType().name(),
+                        ServerError.SERVER_ERROR.getClientCode(), "Something went wrong");
                 sendErrorMessage(errorMessage, message, originalRoutingKey, channel);
             }
 
@@ -137,7 +138,7 @@ public class RetryHandler {
         }
     }
 
-    private void sendErrorMessage(ErrorMessage message, AmpqMessage consumedMessage, String originalRoutingKey,
+    private void sendErrorMessage(ErrorMessage message, AmqpMessage consumedMessage, String originalRoutingKey,
             Channel channel) {
         final var headers = new HashMap<>(consumedMessage.properties().getHeaders());
         headers.remove(MessagingHeaders.Message.JWT);
@@ -155,7 +156,7 @@ public class RetryHandler {
         }
     }
 
-    private Delivery getMessageWithNewHeaders(AmpqMessage message, int retryCount) {
+    private Delivery getMessageWithNewHeaders(AmqpMessage message, int retryCount) {
         retryCount += 1;
         final var properties = message.properties();
         final var headers = properties.getHeaders();

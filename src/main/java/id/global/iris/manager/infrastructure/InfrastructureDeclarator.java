@@ -147,7 +147,7 @@ public class InfrastructureDeclarator {
     }
 
     public record QueueDeclarationDetails(String queueName, boolean durable, boolean exclusive, boolean autoDelete,
-                                          Map<String, Object> arguments) {
+            Map<String, Object> arguments) {
 
     }
 
