@@ -1,5 +1,7 @@
 package id.global.iris.manager.retry;
 
+import static id.global.common.headers.amqp.MessagingHeaders.Message.SESSION_ID;
+import static id.global.common.headers.amqp.MessagingHeaders.Message.USER_ID;
 import static id.global.common.headers.amqp.MessagingHeaders.QueueDeclaration.X_DEAD_LETTER_EXCHANGE;
 import static id.global.common.headers.amqp.MessagingHeaders.QueueDeclaration.X_DEAD_LETTER_ROUTING_KEY;
 import static id.global.common.headers.amqp.MessagingHeaders.RequeueMessage.X_ERROR_CODE;
@@ -14,28 +16,16 @@ import java.util.Optional;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Envelope;
 
-public record AmpqMessage(byte[] body, AMQP.BasicProperties properties, Envelope envelope) {
+import id.global.iris.messaging.runtime.api.error.ServerError;
 
-    public static final String ERR_SERVER_ERROR = "ERR_SERVER_ERROR";
+public record AmqpMessage(byte[] body, AMQP.BasicProperties properties, Envelope envelope) {
 
     public String userId() {
-        return getStringHeader(properties, "userId");
-    }
-
-    public String correlationId() {
-        return properties.getCorrelationId();
-    }
-
-    public String clientTraceId() {
-        return getStringHeader(properties, "clientTraceId");
+        return getStringHeader(properties, USER_ID);
     }
 
     public String sessionId() {
-        return getStringHeader(properties, "sessionId");
-    }
-
-    public String currentServiceId() {
-        return getStringHeader(properties, "currentServiceId");
+        return getStringHeader(properties, SESSION_ID);
     }
 
     public Optional<String> deadLetterExchange() {
@@ -56,7 +46,7 @@ public record AmpqMessage(byte[] body, AMQP.BasicProperties properties, Envelope
 
     public String errorCode() {
         return Optional.ofNullable(getStringHeader(properties, X_ERROR_CODE))
-                .orElse(ERR_SERVER_ERROR);
+                .orElse(ServerError.SERVER_ERROR.getClientCode());
     }
 
     public boolean notifyClient() {
