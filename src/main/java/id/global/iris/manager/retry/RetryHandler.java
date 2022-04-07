@@ -26,7 +26,6 @@ import id.global.common.iris.Queues;
 import id.global.iris.manager.InstanceInfoProvider;
 import id.global.iris.manager.connection.ConnectionProvider;
 import id.global.iris.manager.retry.error.ErrorMessage;
-import id.global.iris.messaging.runtime.api.error.ServerError;
 
 /**
  * Consumes messages from general retry queue and publishes them to TTL backoff retry queue.
@@ -37,6 +36,8 @@ public class RetryHandler {
     private static final Logger log = LoggerFactory.getLogger(RetryHandler.class);
     private static final String RETRY_QUEUE_NAME = Queues.RETRY.getValue();
     private static final String RETRY_EXCHANGE_NAME = Exchanges.RETRY.getValue();
+    public static final String INTERNAL_SERVER_ERROR_TYPE = "INTERNAL_SERVER_ERROR";
+    public static final String SERVER_ERROR_CLIENT_CODE = "SERVER_ERROR";
 
     private final ObjectMapper objectMapper;
     private final ConnectionProvider connectionProvider;
@@ -117,8 +118,8 @@ public class RetryHandler {
                     maxRetries, originalExchange, originalRoutingKey, errorCode));
 
             if (notifyClient) {
-                final var errorMessage = new ErrorMessage(ServerError.SERVER_ERROR.getType().name(),
-                        ServerError.SERVER_ERROR.getClientCode(), "Something went wrong");
+                final var errorMessage = new ErrorMessage(INTERNAL_SERVER_ERROR_TYPE,
+                        SERVER_ERROR_CLIENT_CODE, "Something went wrong");
                 sendErrorMessage(errorMessage, message, originalRoutingKey, channel);
             }
 

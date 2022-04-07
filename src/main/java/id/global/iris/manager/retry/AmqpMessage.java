@@ -10,13 +10,12 @@ import static id.global.common.headers.amqp.MessagingHeaders.RequeueMessage.X_NO
 import static id.global.common.headers.amqp.MessagingHeaders.RequeueMessage.X_ORIGINAL_EXCHANGE;
 import static id.global.common.headers.amqp.MessagingHeaders.RequeueMessage.X_ORIGINAL_ROUTING_KEY;
 import static id.global.common.headers.amqp.MessagingHeaders.RequeueMessage.X_RETRY_COUNT;
+import static id.global.iris.manager.retry.RetryHandler.SERVER_ERROR_CLIENT_CODE;
 
 import java.util.Optional;
 
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Envelope;
-
-import id.global.iris.messaging.runtime.api.error.ServerError;
 
 public record AmqpMessage(byte[] body, AMQP.BasicProperties properties, Envelope envelope) {
 
@@ -46,7 +45,7 @@ public record AmqpMessage(byte[] body, AMQP.BasicProperties properties, Envelope
 
     public String errorCode() {
         return Optional.ofNullable(getStringHeader(properties, X_ERROR_CODE))
-                .orElse(ServerError.SERVER_ERROR.getClientCode());
+                .orElse(SERVER_ERROR_CLIENT_CODE);
     }
 
     public boolean notifyClient() {
