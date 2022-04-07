@@ -1,8 +1,8 @@
 package id.global.iris.manager.retry;
 
-import static id.global.common.headers.amqp.MessagingHeaders.QueueDeclaration.X_DEAD_LETTER_EXCHANGE;
-import static id.global.common.headers.amqp.MessagingHeaders.QueueDeclaration.X_DEAD_LETTER_ROUTING_KEY;
-import static id.global.common.headers.amqp.MessagingHeaders.QueueDeclaration.X_MESSAGE_TTL;
+import static id.global.common.constants.iris.MessagingHeaders.QueueDeclaration.X_DEAD_LETTER_EXCHANGE;
+import static id.global.common.constants.iris.MessagingHeaders.QueueDeclaration.X_DEAD_LETTER_ROUTING_KEY;
+import static id.global.common.constants.iris.MessagingHeaders.QueueDeclaration.X_MESSAGE_TTL;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -14,8 +14,8 @@ import javax.inject.Inject;
 
 import com.rabbitmq.client.Channel;
 
-import id.global.common.iris.Exchanges;
-import id.global.common.iris.Queues;
+import id.global.common.constants.iris.Exchanges;
+import id.global.common.constants.iris.Queues;
 import id.global.iris.manager.config.Configuration;
 import id.global.iris.manager.infrastructure.InfrastructureDeclarator;
 
