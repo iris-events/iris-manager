@@ -1,7 +1,7 @@
 package id.global.iris.manager.retry;
 
-import static id.global.common.headers.amqp.MessagingHeaders.RequeueMessage.X_ORIGINAL_EXCHANGE;
-import static id.global.common.headers.amqp.MessagingHeaders.RequeueMessage.X_ORIGINAL_ROUTING_KEY;
+import static id.global.common.constants.iris.MessagingHeaders.RequeueMessage.X_ORIGINAL_EXCHANGE;
+import static id.global.common.constants.iris.MessagingHeaders.RequeueMessage.X_ORIGINAL_ROUTING_KEY;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -15,8 +15,8 @@ import org.slf4j.LoggerFactory;
 
 import com.rabbitmq.client.Channel;
 
-import id.global.common.iris.Exchanges;
-import id.global.common.iris.Queues;
+import id.global.common.constants.iris.Exchanges;
+import id.global.common.constants.iris.Queues;
 import id.global.iris.manager.connection.ConnectionProvider;
 
 /**
