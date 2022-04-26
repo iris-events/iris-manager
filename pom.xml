@@ -4,7 +4,7 @@
     <parent>
         <groupId>id.global</groupId>
         <artifactId>microservice-parent</artifactId>
-        <version>4.15</version>
+        <version>5.0</version>
         <relativePath />
     </parent>
     <groupId>id.global.iris</groupId>
