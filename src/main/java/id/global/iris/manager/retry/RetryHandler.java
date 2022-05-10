@@ -1,7 +1,7 @@
 package id.global.iris.manager.retry;
 
-import static id.global.common.constants.iris.MessagingHeaders.Message.EVENT_TYPE;
-import static id.global.common.constants.iris.MessagingHeaders.RequeueMessage.X_RETRY_COUNT;
+import static id.global.common.iris.constants.MessagingHeaders.Message.EVENT_TYPE;
+import static id.global.common.iris.constants.MessagingHeaders.RequeueMessage.X_RETRY_COUNT;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -20,9 +20,9 @@ import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Delivery;
 import com.rabbitmq.client.Envelope;
 
-import id.global.common.constants.iris.Exchanges;
-import id.global.common.constants.iris.MessagingHeaders;
-import id.global.common.constants.iris.Queues;
+import id.global.common.iris.constants.Exchanges;
+import id.global.common.iris.constants.MessagingHeaders;
+import id.global.common.iris.constants.Queues;
 import id.global.iris.manager.InstanceInfoProvider;
 import id.global.iris.manager.connection.ConnectionProvider;
 import id.global.iris.manager.retry.error.ErrorMessage;
