@@ -1,6 +1,6 @@
 package id.global.iris.manager.queue.utils;
 
-import static id.global.common.constants.iris.MessagingHeaders.RequeueMessage.X_RETRY_COUNT;
+import static id.global.common.iris.constants.MessagingHeaders.RequeueMessage.X_RETRY_COUNT;
 
 import java.util.HashMap;
 import java.util.Map;
