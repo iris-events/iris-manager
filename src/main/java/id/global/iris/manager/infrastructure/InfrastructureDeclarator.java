@@ -35,6 +35,7 @@ public class InfrastructureDeclarator {
     private static final String USER_EXCHANGE = Exchanges.USER.getValue();
     private static final String BROADCAST_EXCHANGE = Exchanges.BROADCAST.getValue();
     private static final String SUBSCRIPTION_EXCHANGE = Exchanges.SUBSCRIPTION.getValue();
+    private static final String SNAPSHOT_REQUESTED_EXCHANGE = Exchanges.SNAPSHOT_REQUESTED.getValue();
 
     private static final String ERROR_QUEUE = Queues.ERROR.getValue();
     private static final String DEAD_LETTER_QUEUE = Queues.DEAD_LETTER.getValue();
@@ -50,7 +51,9 @@ public class InfrastructureDeclarator {
             Exchanges.SESSION, new ExchangeDeclarationDetails(SESSION_EXCHANGE, BuiltinExchangeType.TOPIC, true),
             Exchanges.USER, new ExchangeDeclarationDetails(USER_EXCHANGE, BuiltinExchangeType.TOPIC, true),
             Exchanges.BROADCAST, new ExchangeDeclarationDetails(BROADCAST_EXCHANGE, BuiltinExchangeType.TOPIC, true),
-            Exchanges.SUBSCRIPTION, new ExchangeDeclarationDetails(SUBSCRIPTION_EXCHANGE, BuiltinExchangeType.TOPIC, true));
+            Exchanges.SUBSCRIPTION, new ExchangeDeclarationDetails(SUBSCRIPTION_EXCHANGE, BuiltinExchangeType.TOPIC, true),
+            Exchanges.SNAPSHOT_REQUESTED,
+            new ExchangeDeclarationDetails(SNAPSHOT_REQUESTED_EXCHANGE, BuiltinExchangeType.TOPIC, true));
 
     private static final Map<Queues, QueueDeclarationDetails> queues = Map.of(
             Queues.ERROR, new QueueDeclarationDetails(ERROR_QUEUE, true, false, false, null),
@@ -147,7 +150,7 @@ public class InfrastructureDeclarator {
     }
 
     public record QueueDeclarationDetails(String queueName, boolean durable, boolean exclusive, boolean autoDelete,
-            Map<String, Object> arguments) {
+                                          Map<String, Object> arguments) {
 
     }
 
