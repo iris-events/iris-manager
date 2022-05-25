@@ -1,7 +1,7 @@
 package id.global.iris.manager.retry;
 
-import static id.global.common.iris.constants.MessagingHeaders.Message.EVENT_TYPE;
-import static id.global.common.iris.constants.MessagingHeaders.RequeueMessage.X_RETRY_COUNT;
+import static id.global.iris.common.constants.MessagingHeaders.Message.EVENT_TYPE;
+import static id.global.iris.common.constants.MessagingHeaders.RequeueMessage.X_RETRY_COUNT;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -20,9 +20,9 @@ import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Delivery;
 import com.rabbitmq.client.Envelope;
 
-import id.global.common.iris.constants.Exchanges;
-import id.global.common.iris.constants.MessagingHeaders;
-import id.global.common.iris.constants.Queues;
+import id.global.iris.common.constants.Exchanges;
+import id.global.iris.common.constants.MessagingHeaders;
+import id.global.iris.common.constants.Queues;
 import id.global.iris.manager.InstanceInfoProvider;
 import id.global.iris.manager.connection.ConnectionProvider;
 import id.global.iris.manager.retry.error.ErrorMessage;
@@ -36,8 +36,6 @@ public class RetryHandler {
     private static final Logger log = LoggerFactory.getLogger(RetryHandler.class);
     private static final String RETRY_QUEUE_NAME = Queues.RETRY.getValue();
     private static final String RETRY_EXCHANGE_NAME = Exchanges.RETRY.getValue();
-    public static final String INTERNAL_SERVER_ERROR_TYPE = "INTERNAL_SERVER_ERROR";
-    public static final String SERVER_ERROR_CLIENT_CODE = "SERVER_ERROR";
 
     private final ObjectMapper objectMapper;
     private final ConnectionProvider connectionProvider;
@@ -111,16 +109,17 @@ public class RetryHandler {
             final var originalExchange = message.originalExchange();
             final var originalRoutingKey = message.originalRoutingKey();
             final var errorCode = message.errorCode();
+            final var errorType = message.errorType();
+            final var errorMessage = message.errorMessage();
             final var notifyClient = message.notifyClient();
             log.error(String.format(
                     "Could not invoke method handler and max retries (%d) are reached,"
-                            + " message is being sent to DLQ. originalExchange=%s, routingKey=%s, errorCode=%s",
-                    maxRetries, originalExchange, originalRoutingKey, errorCode));
+                            + " message is being sent to DLQ. originalExchange=%s, routingKey=%s, errorCode=%s, errorType=%s, errorMessage=%s",
+                    maxRetries, originalExchange, originalRoutingKey, errorCode, errorType, errorMessage));
 
             if (notifyClient) {
-                final var errorMessage = new ErrorMessage(INTERNAL_SERVER_ERROR_TYPE,
-                        SERVER_ERROR_CLIENT_CODE, "Something went wrong");
-                sendErrorMessage(errorMessage, message, originalRoutingKey, channel);
+                final var errorMessageEvent = new ErrorMessage(errorType.name(), errorCode, errorMessage);
+                sendErrorMessage(errorMessageEvent, message, originalRoutingKey, channel);
             }
 
             final var deadLetterExchange = message.deadLetterExchange();

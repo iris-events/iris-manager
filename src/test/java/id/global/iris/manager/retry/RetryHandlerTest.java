@@ -1,7 +1,7 @@
 package id.global.iris.manager.retry;
 
-import static id.global.common.iris.constants.MessagingHeaders.RequeueMessage.X_ORIGINAL_EXCHANGE;
-import static id.global.common.iris.constants.MessagingHeaders.RequeueMessage.X_ORIGINAL_ROUTING_KEY;
+import static id.global.iris.common.constants.MessagingHeaders.RequeueMessage.X_ORIGINAL_EXCHANGE;
+import static id.global.iris.common.constants.MessagingHeaders.RequeueMessage.X_ORIGINAL_ROUTING_KEY;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -24,8 +24,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 
-import id.global.common.iris.annotations.Message;
-import id.global.common.iris.annotations.MessageHandler;
+import id.global.iris.common.annotations.Message;
+import id.global.iris.common.annotations.MessageHandler;
 import io.quarkiverse.rabbitmqclient.RabbitMQClient;
 import io.quarkus.test.junit.QuarkusTest;
 

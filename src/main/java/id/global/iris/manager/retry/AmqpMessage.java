@@ -1,21 +1,24 @@
 package id.global.iris.manager.retry;
 
-import static id.global.common.iris.constants.MessagingHeaders.Message.SESSION_ID;
-import static id.global.common.iris.constants.MessagingHeaders.Message.USER_ID;
-import static id.global.common.iris.constants.MessagingHeaders.QueueDeclaration.X_DEAD_LETTER_EXCHANGE;
-import static id.global.common.iris.constants.MessagingHeaders.QueueDeclaration.X_DEAD_LETTER_ROUTING_KEY;
-import static id.global.common.iris.constants.MessagingHeaders.RequeueMessage.X_ERROR_CODE;
-import static id.global.common.iris.constants.MessagingHeaders.RequeueMessage.X_MAX_RETRIES;
-import static id.global.common.iris.constants.MessagingHeaders.RequeueMessage.X_NOTIFY_CLIENT;
-import static id.global.common.iris.constants.MessagingHeaders.RequeueMessage.X_ORIGINAL_EXCHANGE;
-import static id.global.common.iris.constants.MessagingHeaders.RequeueMessage.X_ORIGINAL_ROUTING_KEY;
-import static id.global.common.iris.constants.MessagingHeaders.RequeueMessage.X_RETRY_COUNT;
-import static id.global.iris.manager.retry.RetryHandler.SERVER_ERROR_CLIENT_CODE;
+import static id.global.iris.common.constants.MessagingHeaders.Message.SESSION_ID;
+import static id.global.iris.common.constants.MessagingHeaders.Message.USER_ID;
+import static id.global.iris.common.constants.MessagingHeaders.QueueDeclaration.X_DEAD_LETTER_EXCHANGE;
+import static id.global.iris.common.constants.MessagingHeaders.QueueDeclaration.X_DEAD_LETTER_ROUTING_KEY;
+import static id.global.iris.common.constants.MessagingHeaders.RequeueMessage.X_ERROR_CODE;
+import static id.global.iris.common.constants.MessagingHeaders.RequeueMessage.X_ERROR_MESSAGE;
+import static id.global.iris.common.constants.MessagingHeaders.RequeueMessage.X_ERROR_TYPE;
+import static id.global.iris.common.constants.MessagingHeaders.RequeueMessage.X_MAX_RETRIES;
+import static id.global.iris.common.constants.MessagingHeaders.RequeueMessage.X_NOTIFY_CLIENT;
+import static id.global.iris.common.constants.MessagingHeaders.RequeueMessage.X_ORIGINAL_EXCHANGE;
+import static id.global.iris.common.constants.MessagingHeaders.RequeueMessage.X_ORIGINAL_ROUTING_KEY;
+import static id.global.iris.common.constants.MessagingHeaders.RequeueMessage.X_RETRY_COUNT;
 
 import java.util.Optional;
 
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Envelope;
+
+import id.global.iris.common.error.ErrorType;
 
 public record AmqpMessage(byte[] body, AMQP.BasicProperties properties, Envelope envelope) {
 
@@ -45,7 +48,17 @@ public record AmqpMessage(byte[] body, AMQP.BasicProperties properties, Envelope
 
     public String errorCode() {
         return Optional.ofNullable(getStringHeader(properties, X_ERROR_CODE))
-                .orElse(SERVER_ERROR_CLIENT_CODE);
+                .orElse(ErrorType.INTERNAL_SERVER_ERROR.name());
+    }
+
+    public ErrorType errorType() {
+        return Optional.of(ErrorType.valueOf(getStringHeader(properties, X_ERROR_TYPE)))
+                .orElse(ErrorType.INTERNAL_SERVER_ERROR);
+    }
+
+    public String errorMessage() {
+        return Optional.ofNullable(getStringHeader(properties, X_ERROR_MESSAGE))
+                .orElse("");
     }
 
     public boolean notifyClient() {

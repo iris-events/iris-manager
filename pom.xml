@@ -17,16 +17,15 @@
         <tag>HEAD</tag>
     </scm>
     <properties>
-        <version.globalid.event-messaging>1.2.21</version.globalid.event-messaging>
-        <version.globalid.common>1.1.12</version.globalid.common>
+        <version.globalid.iris>2.0.2</version.globalid.iris>
         <version.quarkus-rabbitmq-client>0.5.0.Final</version.quarkus-rabbitmq-client>
         <version.hamcrest>2.2</version.hamcrest>
     </properties>
     <dependencies>
         <dependency>
-            <groupId>id.global.common</groupId>
-            <artifactId>globalid-common</artifactId>
-            <version>${version.globalid.common}</version>
+            <groupId>id.global.iris</groupId>
+            <artifactId>iris-common</artifactId>
+            <version>${version.globalid.iris}</version>
         </dependency>
 
         <dependency>
@@ -58,8 +57,8 @@
 
         <dependency>
             <groupId>id.global.iris</groupId>
-            <artifactId>event-messaging</artifactId>
-            <version>${version.globalid.event-messaging}</version>
+            <artifactId>quarkus-iris</artifactId>
+            <version>${version.globalid.iris}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

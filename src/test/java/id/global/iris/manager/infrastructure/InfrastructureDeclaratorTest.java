@@ -1,6 +1,6 @@
 package id.global.iris.manager.infrastructure;
 
-import static id.global.common.iris.constants.MessagingHeaders.QueueDeclaration.X_MESSAGE_TTL;
+import static id.global.iris.common.constants.MessagingHeaders.QueueDeclaration.X_MESSAGE_TTL;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -21,8 +21,8 @@ import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 
-import id.global.common.iris.constants.Exchanges;
-import id.global.common.iris.constants.Queues;
+import id.global.iris.common.constants.Exchanges;
+import id.global.iris.common.constants.Queues;
 import id.global.iris.manager.connection.ConnectionProvider;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
