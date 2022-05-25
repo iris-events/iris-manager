@@ -1,6 +1,6 @@
 package id.global.iris.manager.infrastructure;
 
-import static id.global.common.iris.constants.MessagingHeaders.QueueDeclaration.X_MESSAGE_TTL;
+import static id.global.iris.common.constants.MessagingHeaders.QueueDeclaration.X_MESSAGE_TTL;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -16,8 +16,8 @@ import org.slf4j.LoggerFactory;
 import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 
-import id.global.common.iris.constants.Exchanges;
-import id.global.common.iris.constants.Queues;
+import id.global.iris.common.constants.Exchanges;
+import id.global.iris.common.constants.Queues;
 import id.global.iris.manager.connection.ConnectionProvider;
 import id.global.iris.manager.retry.BackoffQueueProvider;
 
@@ -150,7 +150,7 @@ public class InfrastructureDeclarator {
     }
 
     public record QueueDeclarationDetails(String queueName, boolean durable, boolean exclusive, boolean autoDelete,
-                                          Map<String, Object> arguments) {
+            Map<String, Object> arguments) {
 
     }
 

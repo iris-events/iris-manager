@@ -1,7 +1,7 @@
 package id.global.iris.manager.retry;
 
-import static id.global.common.iris.constants.MessagingHeaders.RequeueMessage.X_ORIGINAL_EXCHANGE;
-import static id.global.common.iris.constants.MessagingHeaders.RequeueMessage.X_ORIGINAL_ROUTING_KEY;
+import static id.global.iris.common.constants.MessagingHeaders.RequeueMessage.X_ORIGINAL_EXCHANGE;
+import static id.global.iris.common.constants.MessagingHeaders.RequeueMessage.X_ORIGINAL_ROUTING_KEY;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -15,8 +15,8 @@ import org.slf4j.LoggerFactory;
 
 import com.rabbitmq.client.Channel;
 
-import id.global.common.iris.constants.Exchanges;
-import id.global.common.iris.constants.Queues;
+import id.global.iris.common.constants.Exchanges;
+import id.global.iris.common.constants.Queues;
 import id.global.iris.manager.connection.ConnectionProvider;
 
 /**
