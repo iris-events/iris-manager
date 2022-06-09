@@ -4,7 +4,7 @@
     <parent>
         <groupId>id.global</groupId>
         <artifactId>microservice-parent</artifactId>
-        <version>5.3</version>
+        <version>5.7</version>
         <relativePath />
     </parent>
     <groupId>id.global.iris</groupId>
@@ -17,7 +17,7 @@
         <tag>HEAD</tag>
     </scm>
     <properties>
-        <version.globalid.iris>2.0.3</version.globalid.iris>
+        <version.globalid.iris>2.0.6</version.globalid.iris>
         <version.quarkus-rabbitmq-client>0.5.0.Final</version.quarkus-rabbitmq-client>
         <version.hamcrest>2.2</version.hamcrest>
     </properties>
