@@ -1,10 +1,10 @@
 package id.global.iris.manager.retry;
 
-import static id.global.iris.common.constants.MessagingHeaders.Message.EVENT_TYPE;
 import static id.global.iris.common.constants.MessagingHeaders.RequeueMessage.X_RETRY_COUNT;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.time.Instant;
 import java.util.HashMap;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -21,8 +21,8 @@ import com.rabbitmq.client.Delivery;
 import com.rabbitmq.client.Envelope;
 
 import id.global.iris.common.constants.Exchanges;
-import id.global.iris.common.constants.MessagingHeaders;
 import id.global.iris.common.constants.Queues;
+import id.global.iris.common.error.ErrorMessageDetailsBuilder;
 import id.global.iris.manager.InstanceInfoProvider;
 import id.global.iris.manager.connection.ConnectionProvider;
 import id.global.iris.manager.retry.error.ErrorMessage;
@@ -119,7 +119,7 @@ public class RetryHandler {
 
             if (notifyClient) {
                 final var errorMessageEvent = new ErrorMessage(errorType.name(), errorCode, errorMessage);
-                sendErrorMessage(errorMessageEvent, message, originalRoutingKey, channel);
+                sendErrorMessage(errorMessageEvent, message, originalExchange, channel);
             }
 
             final var deadLetterExchange = message.deadLetterExchange();
@@ -138,19 +138,23 @@ public class RetryHandler {
         }
     }
 
-    private void sendErrorMessage(ErrorMessage message, AmqpMessage consumedMessage, String originalRoutingKey,
-            Channel channel) {
-        final var headers = new HashMap<>(consumedMessage.properties().getHeaders());
-        headers.remove(MessagingHeaders.Message.JWT);
-        headers.put(EVENT_TYPE, Exchanges.ERROR.getValue());
+    private void sendErrorMessage(ErrorMessage message, AmqpMessage consumedMessage, String originalExchange, Channel channel) {
+        final var originalMessageHeaders = consumedMessage.properties().getHeaders();
+        final var currentTimestamp = Instant.now().toEpochMilli();
+        final var errorMessageDetails = ErrorMessageDetailsBuilder
+                .build(originalExchange,
+                        originalMessageHeaders,
+                        currentTimestamp);
+
+        final var exchange = errorMessageDetails.exchange();
+        final var routingKey = errorMessageDetails.routingKey();
+        final var messageHeaders = errorMessageDetails.messageHeaders();
         final var basicProperties = consumedMessage.properties().builder()
-                .headers(headers)
+                .headers(messageHeaders)
                 .build();
-        final var routingKey = originalRoutingKey + ".error";
         try {
-            log.info("Sending error message to exchange: {} with routing key: {}", Exchanges.ERROR.getValue(), routingKey);
-            channel.basicPublish(Exchanges.ERROR.getValue(), routingKey, basicProperties,
-                    objectMapper.writeValueAsBytes(message));
+            log.info("Sending error message to exchange: {} with routing key: {}", exchange, routingKey);
+            channel.basicPublish(exchange, routingKey, basicProperties, objectMapper.writeValueAsBytes(message));
         } catch (IOException e) {
             log.error("Unable to write error message as bytes. Discarding error message. Message: {}", message);
         }
