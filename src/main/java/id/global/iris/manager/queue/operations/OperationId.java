@@ -2,7 +2,7 @@ package id.global.iris.manager.queue.operations;
 
 import java.util.UUID;
 
-import org.jetbrains.annotations.NotNull;
+import javax.validation.constraints.NotNull;
 
 public record OperationId(String value) {
 
