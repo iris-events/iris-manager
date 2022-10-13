@@ -9,12 +9,12 @@
     </parent>
     <groupId>id.global.iris</groupId>
     <artifactId>iris-manager</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4-SNAPSHOT</version>
     <scm>
         <connection>scm:git:git@github.com:globalid/iris-manager.git</connection>
         <developerConnection>scm:git:git@github.com:globalid/iris-manager.git</developerConnection>
         <url>https://github.com/globalid/iris-manager</url>
-        <tag>v1.0.3</tag>
+        <tag>HEAD</tag>
     </scm>
     <properties>
         <version.quarkus-rabbitmq-client>0.5.2</version.quarkus-rabbitmq-client>
