@@ -1,0 +1,163 @@
+name: Workflow to deploy on k8s
+on:
+  workflow_call:
+    inputs:
+      customDockerFile:
+        type: string
+        description: Custom docker file
+        required: false
+      legacyDeploy:
+        type: boolean
+        default: false
+        description: Deploy the service with local helm configuration
+        required: false
+    secrets:
+      NPM_TOKEN:
+        description: NPM token
+        required: true
+      AWS_ACCESS_KEY_ID:
+        description: AWS access key ID
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        description: AWS access key secret
+        required: true
+      KUBECONFIG:
+        required: true
+      PRISMA_USER:
+        description: prisma cloud onsole user
+        required: true
+      PRISMA_PASS:
+        description: prisma cloud console password
+        required: true
+      GHA_BOT_USERNAME:
+        description: github bot username
+        required: true
+      GHA_BOT_TOKEN:
+        description: github bot token
+        required: true
+env:
+  ROOT_AWS_ACCOUNT_ID: 715299534867
+jobs:
+  repoMeta:
+    name: Prepare workflow
+    runs-on: ubuntu-latest
+    outputs:
+      group: ${{ steps.repo-meta.outputs.group }}
+      name: ${{ steps.repo-meta.outputs.name }}
+      image-name: ${{ steps.repo-meta.outputs.image-name }}
+      tag-name: ${{ steps.repo-meta.outputs.tag-name }}
+      namespace: ${{ steps.repo-meta.outputs.namespace }}
+      release-type: ${{ steps.repo-meta.outputs.release-type }}
+      deploy-config: ${{ steps.repo-meta.outputs.deploy-config }}
+      deploy-name: ${{ steps.repo-meta.outputs.deploy-name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Populate metadata
+        id: repo-meta
+        uses: globalid/github-actions/get-event-information@prod
+
+  docker:
+    if: ${{ needs.repoMeta.outputs.deploy-config }}
+    needs: [repoMeta]
+    name: Docker image
+    runs-on: ubuntu-latest
+    steps:
+      - name: setup java
+        uses: globalid/github-actions/java-setup@main
+      - name: build project
+        shell: bash
+        run: mvn $MAVEN_CLI_OPTS package $MAVEN_OPS
+        env:
+          MAVEN_OPS: "-Dmaven.test.skip=true -Dtest.skip.docker=true"
+          MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -ntp -Dno-format -Dci"
+      - name: Docker image
+        uses: globalid/github-actions/docker-image@main
+        with:
+          customDockerFile: ${{ inputs.customDockerFile }}
+          runtime: 'quarkus'
+          image-name: ${{ needs.repoMeta.outputs.image-name }}
+          GITHUB_TOKEN: ${{ github.token }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          ROOT_AWS_ACCOUNT_ID: ${{ env.ROOT_AWS_ACCOUNT_ID }}
+          PRISMA_USER: ${{ secrets.PRISMA_USER }}
+          PRISMA_PASS: ${{ secrets.PRISMA_PASS }}
+
+  deploy:
+    needs:
+      - docker
+      - repoMeta
+    runs-on: ${{matrix.runners }}
+    strategy:
+      matrix:
+        include: ${{ fromJson(needs.repoMeta.outputs.deploy-config) }}
+    concurrency:
+      group: ${{ matrix.environment }}-${{ github.ref }}
+      cancel-in-progress: true
+    name: K8S ${{ matrix.environment }}
+    environment: ${{ matrix.environment }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: helm login
+        run: |
+          helm repo add globalid https://raw.githubusercontent.com/globalid/helm-charts/gh-pages --pass-credentials --username ${USER} --password ${PASS}
+          helm repo update
+        env:
+          USER: ${{ secrets.GHA_BOT_USERNAME }}
+          PASS: ${{ secrets.GHA_BOT_TOKEN }}
+      - name: render helm template
+        run: |
+          helm template ${{ needs.repoMeta.outputs.deploy-name }} globalid/micro-service -f ./deploy/default.yaml,./${{ matrix.helmCustomization }} --set awsAccountId=${{ matrix.awsAccountId }} --set awsRegion=${{ matrix.region }}  --set awsRolePrefix=${{ matrix.awsRolePrefix }} --set image.repository="${{ needs.repoMeta.outputs.image-name }}" --set image.tag="${{ needs.repoMeta.outputs.tag-name }}"  --set job.id=${{ github.run_id }} --set autoscaling.enabled=false --set replicaCount=1 > ${{ matrix.manifest }}
+      #- name: render helm template
+      #  uses: azure/k8s-bake@v2.2
+      #  with:
+      #    renderEngine: 'helm'
+      #    helmChart: 'globalid/micro-service'
+      #    namespace: ${{ matrix.namespace }}
+      #    releaseName: ${{ needs.repoMeta.outputs.deploy-name }}
+      #    overrideFiles: |
+      #      ./deploy/default.yaml
+      #      ${{ matrix.helmCustomization }}
+      #    overrides: |
+      #      awsAccountId: ${{ matrix.awsAccountId }}
+      #      awsRegion: ${{ matrix.region }}
+      #      awsRolePrefix: ${{ matrix.awsRolePrefix }}
+      #      image.repository: "${{ needs.repoMeta.outputs.image-name }}"
+      #      image.tag: "${{ needs.repoMeta.outputs.tag-name }}"
+      #      job.id: ${{ github.run_id }}
+      #      autoscaling.enabled: false
+      #      replicaCount: 1
+      #    helm-version: 'latest'
+      #    silent: 'false'
+      - name: Store manifests
+        uses: actions/upload-artifact@v3
+        with:
+          name: manifest-${{ matrix.environment }}
+          path: "*manifest.yaml"
+      - uses: azure/k8s-set-context@v3
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBECONFIG }}
+          context: ${{ matrix.context }}
+        id: setcontext
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        if: ${{ matrix.eks }}
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ matrix.region }}
+
+      - name: kubernetes deploy
+        uses: Azure/k8s-deploy@v4.4
+        with:
+          #manifests: ${{ steps.bake.outputs.manifestsBundle }}
+          manifests: "${{ matrix.manifest }}"
+          namespace: ${{ matrix.namespace }}
+
+        timeout-minutes: 3
+        continue-on-error: ${{ matrix.eks }}
+
+

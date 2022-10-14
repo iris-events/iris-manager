@@ -5,14 +5,9 @@ on:
     branches:
       - 'master'
       - 'main'
+      - 'feat-*'
     tags:
       - 'v*'
-  pull_request_target:
-    types:
-      - ready_for_review
-    branches:
-      - 'main'
-      - 'master'
   workflow_dispatch:
 
 
@@ -22,19 +17,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Wait for tests to succeed
-        uses: lewagon/wait-on-check-action@v1.1.1
+        uses: lewagon/wait-on-check-action@v1.1.2
         with:
-          ref: ${{ github.sha }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           check-name: 'run-tests'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
   deploy:
     name: Deploy
     needs:
       - wait
-    uses: globalid/.github/.github/workflows/deploy-k8s-quarkus.yml@master
-    secrets:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      KUBECONFIG: ${{ secrets.KUBECONFIG }}
-      PRISMA_USER: ${{ secrets.PRISMA_USER }}
-      PRISMA_PASS: ${{ secrets.PRISMA_PASS }}
+    #uses: globalid/.github/.github/workflows/deploy-k8s-quarkus.yml@master
+    uses: ./.github/workflows/deploy-to-k8s.yml
+    secrets: inherit
