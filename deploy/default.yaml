@@ -1,0 +1,25 @@
+volumes:
+  - name: secret-volume
+    secret:
+      secretName: jwt-public-key
+container:
+  volumeMounts:
+    - name: secret-volume
+      mountPath: /opt/secret-volume
+      readOnly: true
+  secretsFrom:
+    - manager
+  env:
+resources:
+  limits: null
+  requests: null
+health:
+  liveliness:
+    path: '/q/health/live'
+  readiness:
+    path: '/q/health/ready'
+  startup:
+    path: '/q/health/started'
+  port: 8080
+
+

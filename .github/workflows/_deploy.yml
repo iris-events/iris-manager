@@ -5,15 +5,9 @@ on:
     branches:
       - 'master'
       - 'main'
+      - 'feat-*'
     tags:
       - 'v*'
-  pull_request_target:
-    types:
-      - ready_for_review
-    branches:
-      - 'main'
-      - 'master'
-  workflow_dispatch:
 
 
 jobs:
@@ -32,9 +26,4 @@ jobs:
     needs:
       - wait
     uses: globalid/.github/.github/workflows/deploy-k8s-quarkus.yml@master
-    secrets:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      KUBECONFIG: ${{ secrets.KUBECONFIG }}
-      PRISMA_USER: ${{ secrets.PRISMA_USER }}
-      PRISMA_PASS: ${{ secrets.PRISMA_PASS }}
+    secrets: inherit
