@@ -17,7 +17,7 @@
         <tag>HEAD</tag>
     </scm>
     <properties>
-        <version.quarkus-rabbitmq-client>0.5.2</version.quarkus-rabbitmq-client>
+        <version.quarkus-rabbitmq-client>0.5.3</version.quarkus-rabbitmq-client>
         <version.hamcrest>2.2</version.hamcrest>
     </properties>
     <dependencies>
