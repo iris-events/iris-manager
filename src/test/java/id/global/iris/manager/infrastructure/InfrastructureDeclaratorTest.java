@@ -72,8 +72,6 @@ class InfrastructureDeclaratorTest {
                 Queues.RETRY_WAIT_ENDED.getValue());
         verify(channel).queueBind(Queues.DEAD_LETTER.getValue(), Exchanges.DEAD_LETTER.getValue(), "#");
 
-        verify(channel, times(6)).close();
-
         verifyNoMoreInteractions(channel);
     }
 

@@ -62,7 +62,9 @@ public class RequeueHandler {
                 consumerTag -> log.warn("Basic consume on {}.{} cancelled. Message for will not be retried",
                         RETRY_EXCHANGE_NAME,
                         RETRY_WAIT_ENDED_QUEUE_NAME),
-                (consumerTag, sig) -> log.warn("Consumer for {}.{} shut down.", RETRY_EXCHANGE_NAME,
-                        RETRY_WAIT_ENDED_QUEUE_NAME));
+                (consumerTag, sig) -> {
+                    log.warn("Consumer for {}.{} shut down. consumerTag: {}, message: {}", RETRY_EXCHANGE_NAME,
+                            RETRY_WAIT_ENDED_QUEUE_NAME, consumerTag, sig.getMessage());
+                });
     }
 }

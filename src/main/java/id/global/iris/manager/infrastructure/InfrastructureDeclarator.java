@@ -70,15 +70,14 @@ public class InfrastructureDeclarator {
 
     public void declareBackboneInfrastructure() {
         log.info("Initializing backbone Iris infrastructure (exchanges, queues).");
-        try (Channel channel = connectionProvider.connect()) {
+        try {
+            Channel channel = connectionProvider.connect();
             declareExchanges(channel);
             declareQueues(channel);
             bindQueues(channel);
             backoffQueueProvider.declareBackoffQueues(channel);
         } catch (IOException ioException) {
             throw new UncheckedIOException(ioException);
-        } catch (TimeoutException timeoutException) {
-            throw new RuntimeException(timeoutException);
         }
     }
 
@@ -126,18 +125,13 @@ public class InfrastructureDeclarator {
         final var autoDelete = details.autoDelete;
         final var arguments = details.arguments;
 
-        try (Channel channel = connectionProvider.connect()) {
-
-            final var declareOk = channel.queueDeclare(queueName, durable, exclusive, autoDelete, arguments);
-            log.info("Queue declared. name: {}, durable: {}, autoDelete: {}, consumers: {}, message count: {}",
-                    declareOk.getQueue(),
-                    durable, autoDelete,
-                    declareOk.getConsumerCount(),
-                    declareOk.getMessageCount());
-        } catch (TimeoutException e) {
-            log.error("Timeout exception obtaining connection and channel while declaring queue. Queue name: " + queueName, e);
-            throw new RuntimeException(e);
-        }
+        Channel channel = connectionProvider.connect();
+        final var declareOk = channel.queueDeclare(queueName, durable, exclusive, autoDelete, arguments);
+        log.info("Queue declared. name: {}, durable: {}, autoDelete: {}, consumers: {}, message count: {}",
+                declareOk.getQueue(),
+                durable, autoDelete,
+                declareOk.getConsumerCount(),
+                declareOk.getMessageCount());
     }
 
     private void declareExchange(final Channel channel, final ExchangeDeclarationDetails details) throws IOException {
