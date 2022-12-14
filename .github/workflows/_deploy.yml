@@ -8,7 +8,7 @@ on:
       - 'feat-*'
     tags:
       - 'v*'
-
+  workflow_dispatch:
 
 jobs:
   wait:
