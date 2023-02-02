@@ -5,7 +5,6 @@ import static id.global.iris.common.constants.MessagingHeaders.QueueDeclaration.
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Map;
-import java.util.concurrent.TimeoutException;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
