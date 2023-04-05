@@ -1,3 +1,6 @@
+container:
+  secretsFrom:
+    - manager
 resources:
   limits: null
   requests: null
