@@ -1,15 +1,3 @@
-volumes:
-  - name: secret-volume
-    secret:
-      secretName: jwt-public-key
-container:
-  volumeMounts:
-    - name: secret-volume
-      mountPath: /opt/secret-volume
-      readOnly: true
-  secretsFrom:
-    - manager
-  env:
 resources:
   limits: null
   requests: null
