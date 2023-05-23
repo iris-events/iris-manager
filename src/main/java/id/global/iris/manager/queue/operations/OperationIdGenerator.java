@@ -1,6 +1,6 @@
 package id.global.iris.manager.queue.operations;
 
-import javax.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class OperationIdGenerator {

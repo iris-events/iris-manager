@@ -24,8 +24,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
-import javax.inject.Inject;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -44,6 +42,7 @@ import id.global.iris.manager.queue.utils.RoutingMessageHeaderModifier;
 import io.quarkiverse.rabbitmqclient.RabbitMQClientException;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
+import jakarta.inject.Inject;
 
 @QuarkusTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

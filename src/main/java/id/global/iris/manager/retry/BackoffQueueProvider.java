@@ -9,15 +9,14 @@ import java.io.UncheckedIOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
 import com.rabbitmq.client.Channel;
 
 import id.global.iris.common.constants.Exchanges;
 import id.global.iris.common.constants.Queues;
 import id.global.iris.manager.config.Configuration;
 import id.global.iris.manager.infrastructure.InfrastructureDeclarator;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 @ApplicationScoped
 public class BackoffQueueProvider {

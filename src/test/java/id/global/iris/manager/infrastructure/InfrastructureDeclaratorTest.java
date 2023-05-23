@@ -11,8 +11,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -25,6 +23,7 @@ import id.global.iris.common.constants.Queues;
 import id.global.iris.manager.connection.ConnectionProvider;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
+import jakarta.inject.Inject;
 
 @QuarkusTest
 class InfrastructureDeclaratorTest {

@@ -2,14 +2,13 @@ package id.global.iris.manager.connection;
 
 import java.io.IOException;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 
 import id.global.iris.manager.InstanceInfoProvider;
 import io.quarkiverse.rabbitmqclient.RabbitMQClient;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 @ApplicationScoped
 public class ConnectionProvider {

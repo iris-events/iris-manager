@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +14,8 @@ import com.rabbitmq.client.GetResponse;
 import id.global.iris.manager.connection.ConnectionProvider;
 import id.global.iris.manager.queue.utils.MessageChecksum;
 import id.global.iris.manager.queue.utils.RoutingMessageHeaderModifier;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 @ApplicationScoped
 public class MessageOperationExecutor {
