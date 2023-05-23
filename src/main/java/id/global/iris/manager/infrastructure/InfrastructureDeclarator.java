@@ -6,9 +6,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Map;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +16,8 @@ import id.global.iris.common.constants.Exchanges;
 import id.global.iris.common.constants.Queues;
 import id.global.iris.manager.connection.ConnectionProvider;
 import id.global.iris.manager.retry.BackoffQueueProvider;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 @ApplicationScoped
 public class InfrastructureDeclarator {

@@ -2,26 +2,26 @@ package id.global.iris.manager.client;
 
 import java.util.List;
 
-import javax.inject.Singleton;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-
 import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 import id.global.iris.manager.client.model.Binding;
 import id.global.iris.manager.client.model.Exchange;
 import id.global.iris.manager.client.model.Queue;
+import jakarta.inject.Singleton;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 
 @RegisterRestClient(configKey = "rabbitmq.management.api")
 @RegisterProvider(RabbitMqAuthProvider.class)
 @Path("/api/")
-@Consumes("application/json")
-@Produces("application/json")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 @Singleton
 public interface RabbitMqManagementApi {
 

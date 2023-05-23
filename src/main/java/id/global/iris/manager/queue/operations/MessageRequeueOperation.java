@@ -3,11 +3,11 @@ package id.global.iris.manager.queue.operations;
 import java.util.List;
 import java.util.Map;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
 import com.rabbitmq.client.GetResponse;
 import com.rabbitmq.client.LongString;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 @ApplicationScoped
 public class MessageRequeueOperation {

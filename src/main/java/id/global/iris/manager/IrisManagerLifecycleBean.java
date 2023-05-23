@@ -1,15 +1,14 @@
 package id.global.iris.manager;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
-import javax.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import id.global.iris.manager.infrastructure.InfrastructureDeclarator;
 import id.global.iris.manager.retry.RetryHandler;
 import io.quarkus.runtime.StartupEvent;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
+import jakarta.inject.Inject;
 
 @ApplicationScoped
 public class IrisManagerLifecycleBean {

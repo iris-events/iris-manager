@@ -5,14 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
 import com.rabbitmq.client.GetResponse;
 
 import id.global.iris.manager.connection.ConnectionProvider;
 import id.global.iris.manager.queue.model.Message;
 import id.global.iris.manager.queue.utils.MessageMapper;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 @ApplicationScoped
 public class QueueListOperation {

@@ -7,9 +7,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Objects;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +15,8 @@ import com.rabbitmq.client.Channel;
 import id.global.iris.common.constants.Exchanges;
 import id.global.iris.common.constants.Queues;
 import id.global.iris.manager.connection.ConnectionProvider;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 /**
  * Consumes message from retry dead letter queue (retry-wait-ended) after retry TTL has expired

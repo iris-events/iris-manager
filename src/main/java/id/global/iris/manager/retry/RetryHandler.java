@@ -7,9 +7,6 @@ import java.io.UncheckedIOException;
 import java.time.Instant;
 import java.util.HashMap;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +23,8 @@ import id.global.iris.common.error.ErrorMessageDetailsBuilder;
 import id.global.iris.manager.InstanceInfoProvider;
 import id.global.iris.manager.connection.ConnectionProvider;
 import id.global.iris.manager.retry.error.ErrorMessage;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 /**
  * Consumes messages from general retry queue and publishes them to TTL backoff retry queue.

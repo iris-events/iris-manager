@@ -2,12 +2,12 @@ package id.global.iris.manager.client;
 
 import java.util.Base64;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.ws.rs.client.ClientRequestContext;
-import javax.ws.rs.client.ClientRequestFilter;
-
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import jakarta.ws.rs.client.ClientRequestContext;
+import jakarta.ws.rs.client.ClientRequestFilter;
 
 @Singleton
 public class RabbitMqAuthProvider implements ClientRequestFilter {

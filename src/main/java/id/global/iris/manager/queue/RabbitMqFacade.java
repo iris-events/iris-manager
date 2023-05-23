@@ -2,9 +2,6 @@ package id.global.iris.manager.queue;
 
 import java.util.List;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import id.global.iris.manager.client.RabbitMqManagementApi;
@@ -13,6 +10,8 @@ import id.global.iris.manager.client.model.Exchange;
 import id.global.iris.manager.client.model.Queue;
 import id.global.iris.manager.queue.model.Message;
 import id.global.iris.manager.queue.operations.Operations;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 @ApplicationScoped
 public class RabbitMqFacade {

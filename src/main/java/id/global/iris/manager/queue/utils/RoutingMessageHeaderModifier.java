@@ -5,11 +5,10 @@ import static id.global.iris.common.constants.MessagingHeaders.RequeueMessage.X_
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.enterprise.context.ApplicationScoped;
-
 import com.rabbitmq.client.AMQP;
 
 import id.global.iris.manager.queue.operations.OperationId;
+import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class RoutingMessageHeaderModifier {
