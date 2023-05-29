@@ -1,6 +1,7 @@
 package id.global.iris.manager.retry;
 
 import static id.global.iris.common.constants.MessagingHeaders.RequeueMessage.X_ORIGINAL_EXCHANGE;
+import static id.global.iris.common.constants.MessagingHeaders.RequeueMessage.X_ORIGINAL_QUEUE;
 import static id.global.iris.common.constants.MessagingHeaders.RequeueMessage.X_ORIGINAL_ROUTING_KEY;
 
 import java.io.IOException;
@@ -53,10 +54,19 @@ public class RequeueHandler {
                     final var headers = message.getProperties().getHeaders();
                     final var originalExchange = Objects.toString(headers.get(X_ORIGINAL_EXCHANGE));
                     final var originalRoutingKey = Objects.toString(headers.get(X_ORIGINAL_ROUTING_KEY));
-                    log.info("Requeuing message back to original exchange. originalExchange={}, originalRoutingkey={}",
-                            originalExchange, originalRoutingKey);
+                    final var originalQueueHeader = headers.get(X_ORIGINAL_QUEUE);
+                    if (originalQueueHeader != null) { // TODO: remove null guard once all services are upgraded to use iris 4.0.3 or higher
+                        final var originalQueue = Objects.toString(originalQueueHeader);
+                        log.info(
+                                "Requeuing message back to original queue. originalQueue={} originalExchange={}, originalRoutingkey={}",
+                                originalQueue, originalExchange, originalRoutingKey);
 
-                    channel.basicPublish(originalExchange, originalRoutingKey, message.getProperties(), message.getBody());
+                        channel.basicPublish("", originalQueue, message.getProperties(), message.getBody());
+                    } else {
+                        log.info("Requeuing message back to original exchange. originalExchange={}, originalRoutingkey={}",
+                                originalExchange, originalRoutingKey);
+                        channel.basicPublish(originalExchange, originalRoutingKey, message.getProperties(), message.getBody());
+                    }
                 }),
                 consumerTag -> log.warn("Basic consume on {}.{} cancelled. Message for will not be retried",
                         RETRY_EXCHANGE_NAME,
