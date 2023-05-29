@@ -1,6 +1,7 @@
 package id.global.iris.manager.retry;
 
 import static id.global.iris.common.constants.MessagingHeaders.RequeueMessage.X_ORIGINAL_EXCHANGE;
+import static id.global.iris.common.constants.MessagingHeaders.RequeueMessage.X_ORIGINAL_QUEUE;
 import static id.global.iris.common.constants.MessagingHeaders.RequeueMessage.X_ORIGINAL_ROUTING_KEY;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -21,8 +22,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 
+import id.global.iris.common.annotations.ExchangeType;
 import id.global.iris.common.annotations.Message;
 import id.global.iris.common.annotations.MessageHandler;
+import id.global.iris.messaging.runtime.QueueNameProvider;
+import id.global.iris.messaging.runtime.context.IrisContext;
 import io.quarkiverse.rabbitmqclient.RabbitMQClient;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -45,6 +49,9 @@ class RetryHandlerTest {
     @Inject
     Service service;
 
+    @Inject
+    QueueNameProvider queueNameProvider;
+
     @BeforeEach
     void setUp() throws Exception {
         final var connection = rabbitMQClient.connect("JwtAuthIT publisher");
@@ -55,9 +62,14 @@ class RetryHandlerTest {
     void retryHandlerShouldRequeueMessage() throws Exception {
         final var messageId = UUID.randomUUID().toString();
         final var message = new RetriedMessage(messageId);
+        final var irisContext = new IrisContext();
+        irisContext.setExchangeType(ExchangeType.FANOUT);
+        irisContext.setName(RETRIED_MESSAGE_EXCHANGE);
+        final var queueName = queueNameProvider.getQueueName(irisContext);
         final AMQP.BasicProperties basicProperties = new AMQP.BasicProperties().builder()
                 .headers(Map.of(X_ORIGINAL_EXCHANGE, RETRIED_MESSAGE_EXCHANGE,
-                        X_ORIGINAL_ROUTING_KEY, "#." + RETRIED_MESSAGE_EXCHANGE))
+                        X_ORIGINAL_ROUTING_KEY, "#." + RETRIED_MESSAGE_EXCHANGE,
+                        X_ORIGINAL_QUEUE, queueName))
                 .build();
 
         channel.basicPublish("retry", "retry", basicProperties, writeValueAsBytes(message));
