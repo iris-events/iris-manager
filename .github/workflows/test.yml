@@ -2,7 +2,7 @@ name: Build
 "on":
   push:
     branches:
-      - '*'
+      - '**'
     tags:
       - v*
   workflow_dispatch: null
@@ -10,8 +10,18 @@ jobs:
   test:
     runs-on: ubuntu-latest
     name: run-tests
+    permissions:
+      packages: read
     steps:
-      - name: setup java
-        uses: globalid/github-actions/java-setup@main
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
       - shell: sh
         run: mvn -B verify -ntp
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
