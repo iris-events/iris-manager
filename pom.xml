@@ -1,30 +1,49 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>id.global</groupId>
-        <artifactId>microservice-parent</artifactId>
-        <version>7.3</version>
-        <relativePath />
-    </parent>
-    <groupId>id.global.iris</groupId>
+
+    <groupId>org.iris-events</groupId>
     <artifactId>iris-manager</artifactId>
-    <version>2.0.2-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
     <scm>
-        <connection>scm:git:git@github.com:globalid/iris-manager.git</connection>
-        <developerConnection>scm:git:git@github.com:globalid/iris-manager.git</developerConnection>
-        <url>https://github.com/globalid/iris-manager</url>
+        <connection>scm:git:git@github.com:iris-events/iris-manager.git</connection>
+        <developerConnection>scm:git:git@github.com:iris-events/iris-manager.git</developerConnection>
+        <url>https://github.com/iris-events/iris-manager</url>
         <tag>HEAD</tag>
     </scm>
     <properties>
         <version.quarkus-rabbitmq-client>3.0.0</version.quarkus-rabbitmq-client>
         <version.hamcrest>2.2</version.hamcrest>
+        <compiler-plugin.version>3.11.0</compiler-plugin.version>
+        <maven.compiler.release>17</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <quarkus.platform.version>3.2.2.Final</quarkus.platform.version>
+        <surefire-plugin.version>3.0.0</surefire-plugin.version>
+        <version.iris-events>5.0.0</version.iris-events>
     </properties>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.quarkus.platform</groupId>
+                <artifactId>quarkus-bom</artifactId>
+                <version>${quarkus.platform.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <dependencies>
         <dependency>
-            <groupId>id.global.iris</groupId>
+            <groupId>org.iris-events</groupId>
             <artifactId>iris-common</artifactId>
-            <version>${version.iris}</version>
+            <version>${version.iris-events}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.iris-events</groupId>
+            <artifactId>quarkus-iris</artifactId>
+            <version>${version.iris-events}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.quarkiverse.rabbitmqclient</groupId>
@@ -49,12 +68,7 @@
             <artifactId>quarkus-smallrye-jwt</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>id.global.iris</groupId>
-            <artifactId>quarkus-iris</artifactId>
-            <version>${version.iris}</version>
-            <scope>test</scope>
-        </dependency>
+
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-junit5</artifactId>
@@ -82,4 +96,42 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.quarkus.platform</groupId>
+                <artifactId>quarkus-maven-plugin</artifactId>
+                <version>${quarkus.platform.version}</version>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>build</goal>
+                            <goal>generate-code</goal>
+                            <goal>generate-code-tests</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${compiler-plugin.version}</version>
+                <configuration>
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${surefire-plugin.version}</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                        <maven.home>${maven.home}</maven.home>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
