@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Objects;
 
+import com.rabbitmq.client.AMQP;
+import org.iris_events.common.MDCEnricher;
 import org.iris_events.manager.connection.ConnectionProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,21 +54,23 @@ public class RequeueHandler {
         channel.basicConsume(RETRY_WAIT_ENDED_QUEUE_NAME, true,
                 ((consumerTag, message) -> {
                     // this relays messages from RETRY queues to original queues
-                    final var headers = message.getProperties().getHeaders();
+                    AMQP.BasicProperties properties = message.getProperties();
+                    final var headers = properties.getHeaders();
                     final var originalExchange = Objects.toString(headers.get(X_ORIGINAL_EXCHANGE));
                     final var originalRoutingKey = Objects.toString(headers.get(X_ORIGINAL_ROUTING_KEY));
                     final var originalQueueHeader = headers.get(X_ORIGINAL_QUEUE);
+                    MDCEnricher.enrichMDC(properties);
                     if (originalQueueHeader != null) { // TODO: remove null guard once all services are upgraded to use iris 4.0.3 or higher
                         final var originalQueue = Objects.toString(originalQueueHeader);
                         log.info(
                                 "Requeuing message back to original queue. originalQueue={} originalExchange={}, originalRoutingkey={}",
                                 originalQueue, originalExchange, originalRoutingKey);
 
-                        channel.basicPublish("", originalQueue, message.getProperties(), message.getBody());
+                        channel.basicPublish("", originalQueue, properties, message.getBody());
                     } else {
                         log.info("Requeuing message back to original exchange. originalExchange={}, originalRoutingkey={}",
                                 originalExchange, originalRoutingKey);
-                        channel.basicPublish(originalExchange, originalRoutingKey, message.getProperties(), message.getBody());
+                        channel.basicPublish(originalExchange, originalRoutingKey, properties, message.getBody());
                     }
                 }),
                 consumerTag -> log.warn("Basic consume on {}.{} cancelled. Message for will not be retried",
