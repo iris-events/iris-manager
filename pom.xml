@@ -20,7 +20,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <quarkus.platform.version>3.2.2.Final</quarkus.platform.version>
         <surefire-plugin.version>3.0.0</surefire-plugin.version>
-        <version.iris-events>5.0.7-SNAPSHOT</version.iris-events>
+        <version.iris-events>5.0.7</version.iris-events>
     </properties>
     <dependencyManagement>
         <dependencies>
