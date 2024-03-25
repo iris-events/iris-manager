@@ -18,10 +18,10 @@ jobs:
         include:
           - name: "JVM"
             dockerfile: src/main/docker/Dockerfile.jvm
-            image: ghcr.io/${{ github.repository_owner }}/manager
+            image: ghcr.io/${{ github.repository_owner }}/${{ github.repository }}
           - name: "Native"
             dockerfile: src/main/docker/Dockerfile.multistage
-            image: ghcr.io/${{ github.repository_owner }}/manager-native
+            image: ghcr.io/${{ github.repository_owner }}/${{ github.repository }}-native
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.name }}
       cancel-in-progress: true
