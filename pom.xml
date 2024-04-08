@@ -21,6 +21,7 @@
         <quarkus.platform.version>3.9.2</quarkus.platform.version>
         <surefire-plugin.version>3.2.5</surefire-plugin.version>
         <version.iris>6.0.4</version.iris>
+        <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -80,6 +81,10 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-rest</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-health</artifactId>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
