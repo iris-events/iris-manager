@@ -14,7 +14,7 @@
 # docker run -i --rm -p 8080:8080 quarkus/iris-demo
 #
 ###
-FROM registry.access.redhat.com/ubi9:latest
+FROM registry.access.redhat.com/ubi9-minimal:latest
 WORKDIR /work/
 RUN chown 1001 /work \
     && chmod "g+rwX" /work \

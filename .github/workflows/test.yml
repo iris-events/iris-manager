@@ -1,3 +1,4 @@
+name: Test
 "on":
   push:
     branches:
@@ -15,7 +16,7 @@ jobs:
     permissions:
       packages: read
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
+      group: "${{ github.workflow }}-${{ github.ref }}"
       cancel-in-progress: true
     strategy:
       fail-fast: false
@@ -35,4 +36,4 @@ jobs:
         run: mvn --batch-mode verify
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        continue-on-error: ${{ matrix.java-version == '21' }}
+

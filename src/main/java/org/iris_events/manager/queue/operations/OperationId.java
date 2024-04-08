@@ -2,7 +2,6 @@ package org.iris_events.manager.queue.operations;
 
 import java.util.UUID;
 
-import jakarta.validation.constraints.NotNull;
 
 public record OperationId(String value) {
 
@@ -12,7 +11,6 @@ public record OperationId(String value) {
         this(generateValue());
     }
 
-    @NotNull
     private static String generateValue() {
         return UUID.randomUUID().toString().replaceAll("-", "");
     }

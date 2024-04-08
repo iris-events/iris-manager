@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Map;
 
+import io.quarkus.test.junit.DisabledOnIntegrationTest;
 import org.iris_events.manager.connection.ConnectionProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,7 @@ import io.quarkus.test.InjectMock;
 import jakarta.inject.Inject;
 
 @QuarkusTest
+@DisabledOnIntegrationTest(value = "This test requires RabbitMQ", forArtifactTypes = {DisabledOnIntegrationTest.ArtifactType.CONTAINER, DisabledOnIntegrationTest.ArtifactType.NATIVE_BINARY})
 class InfrastructureDeclaratorTest {
 
     @Inject

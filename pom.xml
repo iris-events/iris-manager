@@ -20,7 +20,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <quarkus.platform.version>3.9.2</quarkus.platform.version>
         <surefire-plugin.version>3.2.5</surefire-plugin.version>
-        <version.iris-events>6.0.4</version.iris-events>
+        <version.iris>6.0.4</version.iris>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -31,18 +31,44 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>org.iris-events</groupId>
+                <artifactId>iris-common</artifactId>
+                <version>${version.iris}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.iris-events</groupId>
+                <artifactId>quarkus-iris</artifactId>
+                <version>${version.iris}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.iris-events</groupId>
+                <artifactId>iris-asyncapi</artifactId>
+                <version>${version.iris}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>org.iris-events</groupId>
             <artifactId>iris-common</artifactId>
-            <version>${version.iris-events}</version>
         </dependency>
         <dependency>
             <groupId>org.iris-events</groupId>
             <artifactId>quarkus-iris</artifactId>
-            <version>${version.iris-events}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -53,21 +79,16 @@
 
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-resteasy</artifactId>
+            <artifactId>quarkus-rest</artifactId>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-resteasy-jackson</artifactId>
+            <artifactId>quarkus-rest-jackson</artifactId>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-rest-client</artifactId>
         </dependency>
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-smallrye-jwt</artifactId>
-        </dependency>
-
 
         <dependency>
             <groupId>io.quarkus</groupId>
@@ -92,7 +113,7 @@
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-smallrye-reactive-messaging-rabbitmq</artifactId>
+            <artifactId>quarkus-messaging-rabbitmq</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -132,6 +153,21 @@
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>native</id>
+            <activation>
+                <property>
+                    <name>native</name>
+                </property>
+            </activation>
+            <properties>
+                <skipITs>false</skipITs>
+                <quarkus.package.type>native</quarkus.package.type>
+            </properties>
+        </profile>
+    </profiles>
 </project>
