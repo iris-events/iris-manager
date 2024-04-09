@@ -20,7 +20,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <quarkus.platform.version>3.9.2</quarkus.platform.version>
         <surefire-plugin.version>3.2.5</surefire-plugin.version>
-        <version.iris>6.0.4</version.iris>
+        <version.iris>6.1.0</version.iris>
         <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
     <dependencyManagement>
@@ -36,12 +36,6 @@
                 <groupId>org.iris-events</groupId>
                 <artifactId>iris-common</artifactId>
                 <version>${version.iris}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>*</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.iris-events</groupId>
@@ -53,12 +47,6 @@
                 <groupId>org.iris-events</groupId>
                 <artifactId>iris-asyncapi</artifactId>
                 <version>${version.iris}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>*</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -77,7 +65,10 @@
             <artifactId>quarkus-rabbitmq-client</artifactId>
             <version>${version.quarkus-rabbitmq-client}</version>
         </dependency>
-
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-opentelemetry</artifactId>
+        </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-rest</artifactId>
@@ -85,6 +76,10 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-smallrye-health</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-logging-json</artifactId>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
