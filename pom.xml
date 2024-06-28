@@ -12,7 +12,7 @@
         <tag>HEAD</tag>
     </scm>
     <properties>
-        <version.quarkus-rabbitmq-client>3.0.1</version.quarkus-rabbitmq-client>
+        <version.quarkus-rabbitmq-client>3.2.0</version.quarkus-rabbitmq-client>
         <version.hamcrest>2.2</version.hamcrest>
         <compiler-plugin.version>3.13.0</compiler-plugin.version>
         <maven.compiler.release>21</maven.compiler.release>
