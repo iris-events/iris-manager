@@ -2,7 +2,8 @@ package org.iris_events.manager.queue.operations;
 
 import java.util.UUID;
 
-import jakarta.validation.constraints.NotNull;
+import io.smallrye.common.constraint.NotNull;
+
 
 public record OperationId(String value) {
 
