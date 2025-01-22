@@ -1,5 +1,6 @@
 package org.iris_events.manager.retry;
 
+import static org.iris_events.common.MessagingHeaders.Message.CURRENT_SERVICE_ID;
 import static org.iris_events.common.MessagingHeaders.RequeueMessage.X_RETRY_COUNT;
 
 import java.io.IOException;
@@ -143,6 +144,7 @@ public class RetryHandler {
         final var errorMessageDetails = ErrorMessageDetailsBuilder
                 .build(originalExchange,
                         originalMessageHeaders,
+                        (String)originalMessageHeaders.get(CURRENT_SERVICE_ID),
                         currentTimestamp);
 
         final var exchange = errorMessageDetails.exchange();

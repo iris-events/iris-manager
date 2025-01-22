@@ -12,15 +12,15 @@
         <tag>HEAD</tag>
     </scm>
     <properties>
-        <version.quarkus-rabbitmq-client>3.0.1</version.quarkus-rabbitmq-client>
+        <version.quarkus-rabbitmq-client>3.2.1</version.quarkus-rabbitmq-client>
         <version.hamcrest>2.2</version.hamcrest>
         <compiler-plugin.version>3.13.0</compiler-plugin.version>
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <quarkus.platform.version>3.9.2</quarkus.platform.version>
+        <quarkus.platform.version>3.17.7</quarkus.platform.version>
         <surefire-plugin.version>3.2.5</surefire-plugin.version>
-        <version.iris>6.1.0</version.iris>
+        <version.iris>6.1.8</version.iris>
         <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
     <dependencyManagement>
